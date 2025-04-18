@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analysis Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+  <link rel="stylesheet" href="../src/output.css">
+  <style>
+    .analysis-card {
+      background-color: #1e293b;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .analysis-card:hover {
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+      transform: translateY(-5px);
+    }
+    
+    .stat-card {
+      background-color: #1e293b;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 50;
+    }
+    
+    .modal-content {
+      max-width: 800px;
+      margin: 5% auto;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .btn-primary {
+      background-color: #4f46e5;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background-color: #4338ca;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+    }
+    
+    .action-button {
+      height: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .action-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s, height 0.4s;
+      z-index: 1;
+    }
+    
+    .action-button:hover::after {
+      width: 150%;
+      height: 200%;
+    }
+    
+    .action-button i,
+    .action-button span {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .sidebar-link {
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-link:hover, .sidebar-link.active {
+      background-color: rgba(79, 70, 229, 0.2);
+      border-left: 3px solid #4f46e5;
+      color: white;
+    }
+    
+    .sidebar-link.active {
+      background-color: rgba(79, 70, 229, 0.3);
+    }
+    
+    .analysis-grid {
+      max-height: calc(100vh - 250px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #4f46e5 #1e293b;
+    }
+    
+    .analysis-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .analysis-grid::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 10px;
+    }
+    
+    .analysis-grid::-webkit-scrollbar-thumb {
+      background: #4f46e5;
+      border-radius: 10px;
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+    
+    .pulse-button {
+      animation: pulse 2s infinite;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    }
+    
+    .form-button {
+      transition: all 0.3s ease;
+    }
+    
+    .form-button:hover {
+      transform: translateY(-2px);
+    }
+    
+    .card-hover {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+    }
+    
+    .action-button {
+      height: 44px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.025em;
+      padding: 0 0.75rem;
+      border-radius: 0.375rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .action-button:active {
+      transform: scale(0.95);
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        z-index: 60;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 50;
+      }
+      
+      .sidebar-overlay.active {
+        display: block;
+      }
+      
+      main {
+        margin-left: 0 !important;
+      }
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      max-width: 90%;
+      width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .glass-effect {
+      background-color: rgba(23, 25, 35, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .bg-gradient-custom {
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+    
+    .chart-container {
+      height: 300px;
+      position: relative;
+    }
+    
+    .chart-legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      margin-right: 1rem;
+    }
+    
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+      margin-right: 0.5rem;
+    }
+    
+    .chart-tooltip {
+      position: absolute;
+      background: rgba(26, 32, 44, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.5rem;
+      border-radius: 0.25rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+      z-index: 10;
+    }
+    
+    .tab-button {
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-button.active {
+      border-bottom: 3px solid #4f46e5;
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .analysis-filter-section {
+      transition: all 0.3s ease;
+    }
+    
+    .filter-collapse-btn {
+      transition: transform 0.3s ease;
+    }
+    
+    .filter-collapse-btn.collapsed {
+      transform: rotate(180deg);
+    }
+    
+    .data-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background-color: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      background-color: #1e293b;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-black bg-gradient-custom text-white min-h-screen font-sans antialiased">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+  
+<div class="flex flex-col md:flex-row">
+  
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 bg-gray-900 p-4 md:h-screen transition-all" id="sidebar">
+    <div class="flex items-center justify-between mb-8 p-2">
+      <div class="flex items-center">
+        <i class="fas fa-bug text-indigo-500 text-2xl mr-2"></i>
+        <h1 class="text-xl font-bold text-indigo-500">CryBug</h1>
+      </div>
+      <button class="close-sidebar md:hidden text-white" id="closeSidebar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <nav>
+      <ul class="space-y-2">
+        <li>
+          <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+            <i class="fas fa-home mr-3"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="dashboard.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+            <i class="fas fa-tachometer-alt mr-3"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="team.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Team">
+            <i class="fas fa-users mr-3"></i>
+            <span>Team</span>
+          </a>
+        </li>
+        <li>
+          <a href="analysis.html" class="sidebar-link active flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Analytics">
+            <i class="fas fa-chart-bar mr-3"></i>
+            <span>Analytics</span>
+          </a>
+        </li>
+        <li>
+          <a href="settings.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+            <i class="fas fa-cog mr-3"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="mt-auto pt-8">
+      <div class="border-t border-gray-700 pt-4">
+        <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+          <i class="fas fa-question-circle mr-3"></i>
+          <span>Help Center</span>
+        </a>
+        <button class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 p-2 rounded flex items-center justify-center transition-all hover:transform hover:translate-y-[-2px]">
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+    <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold">Analytics Dashboard</h1>
+        <p class="text-gray-400">View metrics, trends, and performance analytics</p>
+      </div>
+      
+      <div class="mt-4 md:mt-0 flex gap-2">
+        <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded flex items-center" id="exportBtn">
+          <i class="fas fa-file-export mr-2"></i> Export Report
+        </button>
+        <button class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded flex items-center" id="createReportBtn">
+          <i class="fas fa-plus mr-2"></i> New Report
+        </button>
+      </div>
+    </div>
+    
+    <!-- Time Range Selector -->
+    <div class="bg-gray-800 p-4 rounded-xl mb-6 analysis-filter-section">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold">Filter Data</h3>
+        <button class="filter-collapse-btn text-gray-400">
+          <i class="fas fa-chevron-up"></i>
+        </button>
+      </div>
+      
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <label class="block text-gray-400 text-sm mb-2">Date Range</label>
+          <div class="flex gap-2">
+            <div class="flex-1">
+              <input type="date" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+            </div>
+            <div class="flex items-center mx-2 text-gray-400">to</div>
+            <div class="flex-1">
+              <input type="date" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex gap-2">
+          <div>
+            <label class="block text-gray-400 text-sm mb-2">Project</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>All Projects</option>
+              <option>Project Alpha</option>
+              <option>Project Beta</option>
+              <option>Project Gamma</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-400 text-sm mb-2">Team</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>All Teams</option>
+              <option>Frontend Team</option>
+              <option>Backend Team</option>
+              <option>QA Team</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="md:self-end">
+          <button class="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded">
+            Apply Filters
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Analytics Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-gray-800 p-4 rounded-xl flex items-center card-hover">
+        <div class="rounded-lg bg-blue-500 bg-opacity-20 p-3 mr-4">
+          <i class="fas fa-code-branch text-blue-400 text-xl"></i>
+        </div>
+        <div>
+          <p class="text-gray-400 text-sm">Commits</p>
+          <p class="text-xl font-bold">287</p>
+          <p class="text-green-400 text-xs flex items-center">
+            <i class="fas fa-arrow-up mr-1"></i> 12% from last month
+          </p>
+        </div>
+      </div>
+      
+      <div class="bg-gray-800 p-4 rounded-xl flex items-center card-hover">
+        <div class="rounded-lg bg-purple-500 bg-opacity-20 p-3 mr-4">
+          <i class="fas fa-bug text-purple-400 text-xl"></i>
+        </div>
+        <div>
+          <p class="text-gray-400 text-sm">Bugs</p>
+          <p class="text-xl font-bold">42</p>
+          <p class="text-red-400 text-xs flex items-center">
+            <i class="fas fa-arrow-up mr-1"></i> 8% from last month
+          </p>
+        </div>
+      </div>
+      
+      <div class="bg-gray-800 p-4 rounded-xl flex items-center card-hover">
+        <div class="rounded-lg bg-green-500 bg-opacity-20 p-3 mr-4">
+          <i class="fas fa-check-circle text-green-400 text-xl"></i>
+        </div>
+        <div>
+          <p class="text-gray-400 text-sm">Issues Resolved</p>
+          <p class="text-xl font-bold">38</p>
+          <p class="text-green-400 text-xs flex items-center">
+            <i class="fas fa-arrow-up mr-1"></i> 15% from last month
+          </p>
+        </div>
+      </div>
+      
+      <div class="bg-gray-800 p-4 rounded-xl flex items-center card-hover">
+        <div class="rounded-lg bg-yellow-500 bg-opacity-20 p-3 mr-4">
+          <i class="fas fa-tasks text-yellow-400 text-xl"></i>
+        </div>
+        <div>
+          <p class="text-gray-400 text-sm">Tasks Completed</p>
+          <p class="text-xl font-bold">124</p>
+          <p class="text-green-400 text-xs flex items-center">
+            <i class="fas fa-arrow-up mr-1"></i> 5% from last month
+          </p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Chart Tabs Section -->
+    <div class="bg-gray-800 rounded-xl mb-8 overflow-hidden">
+      <div class="border-b border-gray-700">
+        <div class="flex overflow-x-auto">
+          <button class="tab-button active" data-tab="bugsTrendTab">
+            <i class="fas fa-bug mr-2"></i> Bugs Trend
+          </button>
+          <button class="tab-button" data-tab="commitsTab">
+            <i class="fas fa-code-branch mr-2"></i> Commit Activity
+          </button>
+          <button class="tab-button" data-tab="teamPerformanceTab">
+            <i class="fas fa-users mr-2"></i> Team Performance
+          </button>
+          <button class="tab-button" data-tab="projectProgressTab">
+            <i class="fas fa-project-diagram mr-2"></i> Project Progress
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <!-- Bugs Trend Tab -->
+        <div id="bugsTrendTab" class="tab-content active">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-lg">Bugs Trend Analysis</h3>
+            <div class="flex gap-2">
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <img src="/api/placeholder/800/300" alt="Bugs Trend Chart" class="w-full h-full object-cover rounded">
+          </div>
+          
+          <div class="chart-legend mt-4">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #ef4444;"></div>
+              <span class="text-sm">Critical Bugs</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #f59e0b;"></div>
+              <span class="text-sm">Major Bugs</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #3b82f6;"></div>
+              <span class="text-sm">Minor Bugs</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #10b981;"></div>
+              <span class="text-sm">Fixed Bugs</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Commit Activity Tab -->
+        <div id="commitsTab" class="tab-content">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-lg">Commit Activity</h3>
+            <div class="flex gap-2">
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <img src="/api/placeholder/800/300" alt="Commit Activity Chart" class="w-full h-full object-cover rounded">
+          </div>
+          
+          <div class="chart-legend mt-4">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #4f46e5;"></div>
+              <span class="text-sm">Frontend Team</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #10b981;"></div>
+              <span class="text-sm">Backend Team</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #f59e0b;"></div>
+              <span class="text-sm">QA Team</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Team Performance Tab -->
+        <div id="teamPerformanceTab" class="tab-content">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-lg">Team Performance</h3>
+            <div class="flex gap-2">
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <img src="/api/placeholder/800/300" alt="Team Performance Chart" class="w-full h-full object-cover rounded">
+          </div>
+          
+          <div class="chart-legend mt-4">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #4f46e5;"></div>
+              <span class="text-sm">Productivity</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #10b981;"></div>
+              <span class="text-sm">Quality</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #f59e0b;"></div>
+              <span class="text-sm">Velocity</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Project Progress Tab -->
+        <div id="projectProgressTab" class="tab-content">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-lg">Project Progress</h3>
+            <div class="flex gap-2">
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-download"></i>
+              </button>
+              <button class="text-gray-400 hover:text-white p-2">
+                <i class="fas fa-expand"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <img src="/api/placeholder/800/300" alt="Project Progress Chart" class="w-full h-full object-cover rounded">
+          </div>
+          
+          <div class="chart-legend mt-4">
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #4f46e5;"></div>
+              <span class="text-sm">Project Alpha</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #10b981;"></div>
+              <span class="text-sm">Project Beta</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color" style="background-color: #f59e0b;"></div>
+              <span class="text-sm">Project Gamma</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+        <!-- Performance Analysis -->
+        <div class="bg-gray-800 rounded-xl p-6 card-hover">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="font-bold text-lg">Team Performance</h3>
+            <button class="text-gray-400 hover:text-white">
+              <i class="fas fa-ellipsis-h"></i>
+            </button>
+          </div>
+          
+          <div class="space-y-6">
+            <div>
+              <div class="flex justify-between mb-2">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/24/24" alt="Frontend Team" class="w-6 h-6 rounded-full mr-2">
+                  <span>Frontend Team</span>
+                </div>
+                <span class="text-blue-400">92%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-blue-500" style="width: 92%"></div>
+              </div>
+            </div>
+            
+            <div>
+              <div class="flex justify-between mb-2">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/24/24" alt="Backend Team" class="w-6 h-6 rounded-full mr-2">
+                  <span>Backend Team</span>
+                </div>
+                <span class="text-green-400">87%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-green-500" style="width: 87%"></div>
+              </div>
+            </div>
+            
+            <div>
+              <div class="flex justify-between mb-2">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/24/24" alt="QA Team" class="w-6 h-6 rounded-full mr-2">
+                  <span>QA Team</span>
+                </div>
+                <span class="text-purple-400">78%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-purple-500" style="width: 78%"></div>
+              </div>
+            </div>
+            
+            <div>
+              <div class="flex justify-between mb-2">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/24/24" alt="DevOps Team" class="w-6 h-6 rounded-full mr-2">
+                  <span>DevOps Team</span>
+                </div>
+                <span class="text-yellow-400">95%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill bg-yellow-500" style="width: 95%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-6 text-center">
+            <button class="text-indigo-400 hover:text-indigo-300 font-medium text-sm">
+              Detailed Performance Report
+            </button>
+          </div>
+        </div>
+      </div>
+      
+     
+      </div>
+    </main>
+  </div>
+  
+  <!-- Create Report Modal -->
+  <div id="createReportModal" class="modal">
+    <div class="modal-content glass-effect p-6 rounded-xl w-full max-w-2xl">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Create New Report</h2>
+        <button class="close-modal text-gray-400 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <form>
+        <div class="mb-4">
+          <label class="block text-gray-300 text-sm font-medium mb-2">Report Title</label>
+          <input type="text" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500" placeholder="Enter report title">
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-gray-300 text-sm font-medium mb-2">Report Type</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500">
+              <option>Bug Analysis</option>
+              <option>Performance Report</option>
+              <option>Team Activity</option>
+              <option>Project Progress</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-300 text-sm font-medium mb-2">Time Period</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500">
+              <option>Last 7 days</option>
+              <option>Last 30 days</option>
+              <option>Last quarter</option>
+              <option>Custom range</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-300 text-sm font-medium mb-2">Description</label>
+          <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500" rows="4" placeholder="Enter report description"></textarea>
+        </div>
+        
+        <div class="mb-6">
+          <label class="block text-gray-300 text-sm font-medium mb-2">Include Sections</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="flex items-center">
+              <input type="checkbox" class="mr-2" checked>
+              <span>Bug Statistics</span>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" class="mr-2" checked>
+              <span>Team Performance</span>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" class="mr-2" checked>
+              <span>Trend Analysis</span>
+            </div>
+            <div class="flex items-center">
+              <input type="checkbox" class="mr-2">
+              <span>Recommendations</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-end gap-4">
+          <button type="button" class="px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded font-medium close-modal">Cancel</button>
+          <button type="button" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded font-medium">Generate Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Tab functionality
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        button.classList.add('active');
+        document.getElementById(button.dataset.tab).classList.add('active');
+      });
+    });
+    
+    // Modal functionality
+    const modal = document.getElementById('createReportModal');
+    const createReportBtn = document.getElementById('createReportBtn');
+    const closeBtns = document.querySelectorAll('.close-modal');
+    
+    createReportBtn.addEventListener('click', () => {
+      modal.style.display = 'flex';
+      setTimeout(() => {
+        modal.querySelector('.modal-content').style.opacity = '1';
+      }, 10);
+    });
+    
+    closeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modal.querySelector('.modal-content').style.opacity = '0';
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      });
+    });
+    
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.querySelector('.modal-content').style.opacity = '0';
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+    });
+    
+    // Mobile sidebar functionality
+    const menuToggle = document.querySelector('.menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+    
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.add('active');
+      sidebarOverlay.classList.add('active');
+    });
+    
+    function closeSidebarFunc() {
+      sidebar.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+    }
+    
+    closeSidebar.addEventListener('click', closeSidebarFunc);
+    sidebarOverlay.addEventListener('click', closeSidebarFunc);
+    
+    // Filter collapse functionality
+    const filterCollapseBtn = document.querySelector('.filter-collapse-btn');
+    const analysisFilterSection = document.querySelector('.analysis-filter-section');
+    
+    filterCollapseBtn.addEventListener('click', () => {
+      filterCollapseBtn.classList.toggle('collapsed');
+      const filterContent = analysisFilterSection.querySelector('.flex.flex-col');
+      if (filterContent.style.display === 'none') {
+        filterContent.style.display = 'flex';
+      } else {
+        filterContent.style.display = 'none';
+      }
+    });
+  </script>
+  </body>
+  </html>

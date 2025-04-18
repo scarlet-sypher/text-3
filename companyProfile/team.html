@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+  <style>
+    .team-card {
+      background-color: #1e293b;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .team-card:hover {
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+      transform: translateY(-5px);
+    }
+    
+    .stat-card {
+      background-color: #1e293b;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 50;
+    }
+    
+    .modal-content {
+      max-width: 500px;
+      margin: 10% auto;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    .avatar-circle {
+      background-color: #2d3748;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .team-card:hover .avatar-circle {
+      border-color: rgba(99, 102, 241, 0.6);
+      transform: scale(1.05);
+    }
+    
+    .btn-primary {
+      background-color: #4f46e5;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background-color: #4338ca;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+    }
+    
+    .btn-danger {
+      background-color: #ef4444;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-danger:hover {
+      background-color: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+    }
+    
+    .btn-success {
+      background-color: #10b981;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-success:hover {
+      background-color: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-info {
+      background-color: #3b82f6;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-info:hover {
+      background-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+    }
+    
+    /* Enhanced action button styling */
+    .action-button {
+      height: 40px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .action-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.4s, height 0.4s;
+      z-index: 1;
+    }
+    
+    .action-button:hover::after {
+      width: 150%;
+      height: 200%;
+    }
+    
+    .action-button i,
+    .action-button span {
+      position: relative;
+      z-index: 2;
+    }
+    
+    .sidebar-link {
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar-link:hover, .sidebar-link.active {
+      background-color: rgba(79, 70, 229, 0.2);
+      border-left: 3px solid #4f46e5;
+      color: white;
+    }
+    
+    .sidebar-link.active {
+      background-color: rgba(79, 70, 229, 0.3);
+    }
+    
+    /* Add scrollbar styling for team members grid */
+    .team-grid {
+      max-height: calc(100vh - 250px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #4f46e5 #1e293b;
+    }
+    
+    .team-grid::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .team-grid::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 10px;
+    }
+    
+    .team-grid::-webkit-scrollbar-thumb {
+      background: #4f46e5;
+      border-radius: 10px;
+    }
+    
+    /* Pulsating Add Member Button */
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+      }
+    }
+    
+    .pulse-button {
+      animation: pulse 2s infinite;
+    }
+    
+    /* Form styling */
+    input:focus, select:focus, textarea:focus {
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    }
+    
+    .form-button {
+      transition: all 0.3s ease;
+    }
+    
+    .form-button:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* Card hover effects */
+    .team-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .team-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(59, 130, 246, 0.15);
+    }
+    
+    /* Improved button animations */
+    .action-button {
+      height: 44px; /* Increased height */
+      font-weight: 600;
+      font-size: 0.9rem; /* Increased font size */
+      letter-spacing: 0.025em;
+      padding: 0 0.75rem;
+      border-radius: 0.375rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Subtle button click effect */
+    .action-button:active {
+      transform: scale(0.95);
+    }
+    
+    /* Grid animation for future expansion */
+    .team-grid {
+      transition: all 0.5s ease;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    /* Modal appearance animation */
+    .modal-active .modal-content {
+      animation: modalAppear 0.4s forwards;
+    }
+    
+    @keyframes modalAppear {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Add member form styling */
+    .form-input-container {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-input-container label {
+      position: absolute;
+      top: -12px;
+      left: 10px;
+      background-color: #1a202c;
+      padding: 0 8px;
+      font-size: 12px;
+      color: #a0aec0;
+      transition: all 0.3s ease;
+    }
+    
+    .form-input-container input:focus + label,
+    .form-input-container select:focus + label {
+      color: #4f46e5;
+    }
+    
+    /* Tooltip styling */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 120px;
+      background-color: #2d3748;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -60px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Smooth sidebar transition */
+    @media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    z-index: 60;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 50;
+  }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+  
+  main {
+    margin-left: 0 !important;
+  }
+}
+
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      max-width: 90%;
+      width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .glass-effect {
+      background-color: rgba(23, 25, 35, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Active state for sidebar links */
+
+    
+    /* Gradient background */
+    .bg-gradient-custom {
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+    
+    /* Card hover effects */
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Team member card */
+    .team-member-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Member action buttons */
+    .team-member-actions {
+      padding-top: 0.75rem;
+      margin-top: 0.75rem;
+      border-top: 1px solid rgba(107, 114, 128, 0.4);
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    /* Error message style */
+    .error-msg {
+      color: #ef4444;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+  </style>
+</head>
+
+<body class="bg-black bg-gradient-custom text-white min-h-screen font-sans antialiased">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+  
+<div class="flex flex-col md:flex-row">
+  
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 bg-gray-900 p-4 md:h-screen transition-all" id="sidebar">
+    <div class="flex items-center justify-between mb-8 p-2">
+        <div class="flex items-center">
+            <i class="fas fa-bug text-indigo-500 text-2xl mr-2"></i>
+            <h1 class="text-xl font-bold text-indigo-500">CryBug</h1>
+          </div>
+      <button class="close-sidebar md:hidden text-white" id="closeSidebar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <nav>
+      <ul class="space-y-2">
+        <li>
+          <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+            <i class="fas fa-home mr-3"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="dashboard.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+            <i class="fas fa-tachometer-alt mr-3"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="team.html" class="sidebar-link active flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Clients">
+            <i class="fas fa-users mr-3"></i>
+            <span>Team</span>
+          </a>
+        </li>
+        <li>
+          <a href="analysis.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Analytics">
+            <i class="fas fa-chart-bar mr-3"></i>
+            <span>Analytics</span>
+          </a>
+        </li>
+        <li>
+          <a href="settings.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+            <i class="fas fa-cog mr-3"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="mt-auto pt-8">
+      <div class="border-t border-gray-700 pt-4">
+        <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+          <i class="fas fa-question-circle mr-3"></i>
+          <span>Help Center</span>
+        </a>
+        <button class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 p-2 rounded flex items-center justify-center transition-all hover:transform hover:translate-y-[-2px]">
+          <i class="fas fa-sign-out-alt mr-2"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+   <!-- Main Content Area -->
+   <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+
+    <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+        <i class="fas fa-bars"></i>
+      </button>
+  <!-- Page Header -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+    <div>
+      <h1 class="text-2xl md:text-3xl font-bold">Team Management</h1>
+      <p class="text-gray-400">View, add and manage team members</p>
+    </div>
+    
+    <button class="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 px-4 py-2 rounded flex items-center" id="addMemberBtn">
+      <i class="fas fa-user-plus mr-2"></i> Add Member
+    </button>
+  </div>
+  
+  <!-- Team Filter Row -->
+  <div class="bg-gray-800 p-4 rounded-xl mb-6">
+    <div class="flex flex-col md:flex-row gap-4">
+      <div class="flex-1">
+        <input type="text" placeholder="Search team members..." class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+      </div>
+      <div class="flex gap-2">
+        <select class="bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+          <option>All Roles</option>
+          <option>Frontend Dev</option>
+          <option>Backend Dev</option>
+          <option>QA Tester</option>
+          <option>Designer</option>
+          <option>Project Manager</option>
+        </select>
+        <select class="bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+          <option>Sort By</option>
+          <option>Name</option>
+          <option>Role</option>
+          <option>Date Joined</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Team Statistics -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+      <div class="rounded-lg bg-blue-500 bg-opacity-20 p-3 mr-4">
+        <i class="fas fa-users text-blue-400 text-xl"></i>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">Total Members</p>
+        <p class="text-xl font-bold">16</p>
+      </div>
+    </div>
+    
+    <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+      <div class="rounded-lg bg-purple-500 bg-opacity-20 p-3 mr-4">
+        <i class="fas fa-laptop-code text-purple-400 text-xl"></i>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">Developers</p>
+        <p class="text-xl font-bold">10</p>
+      </div>
+    </div>
+    
+    <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+      <div class="rounded-lg bg-green-500 bg-opacity-20 p-3 mr-4">
+        <i class="fas fa-vial text-green-400 text-xl"></i>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">QA Testers</p>
+        <p class="text-xl font-bold">4</p>
+      </div>
+    </div>
+    
+    <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+      <div class="rounded-lg bg-yellow-500 bg-opacity-20 p-3 mr-4">
+        <i class="fas fa-tasks text-yellow-400 text-xl"></i>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm">Project Managers</p>
+        <p class="text-xl font-bold">2</p>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Team Members Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+    <!-- Team Member 1 -->
+    <div class="bg-gray-800 rounded-xl p-5 card-hover team-member-card">
+      <div class="flex justify-center mb-4">
+        <img src="/api/placeholder/100/100" alt="Alice Johnson" class="w-24 h-24 rounded-full border-4 border-gray-700">
+      </div>
+      <div class="text-center mb-4">
+        <h3 class="text-lg font-bold">Alice Johnson</h3>
+        <p class="text-blue-400">Frontend Lead</p>
+        <p class="text-gray-400 text-sm">alice.johnson@crybug.com</p>
+      </div>
+      
+      <div class="border-t border-gray-700 pt-3">
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Projects</span>
+          <span>4</span>
+        </div>
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Bugs Fixed</span>
+          <span>32</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-400">Joined</span>
+          <span>Jan 15, 2024</span>
+        </div>
+      </div>
+      
+      <div class="team-member-actions">
+        <button class="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1 rounded-lg promote-btn" data-member="Alice Johnson">
+          <i class="fas fa-arrow-up mr-1"></i> Promote
+        </button>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-lg salary-btn" data-member="Alice Johnson">
+          <i class="fas fa-dollar-sign mr-1"></i> Salary
+        </button>
+        <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded-lg remove-btn" data-member="Alice Johnson">
+          <i class="fas fa-user-minus mr-1"></i> Remove
+        </button>
+      </div>
+    </div>
+    
+    <!-- Team Member 2 -->
+    <div class="bg-gray-800 rounded-xl p-5 card-hover team-member-card">
+      <div class="flex justify-center mb-4">
+        <img src="/api/placeholder/100/100" alt="Bob Smith" class="w-24 h-24 rounded-full border-4 border-gray-700">
+      </div>
+      <div class="text-center mb-4">
+        <h3 class="text-lg font-bold">Bob Smith</h3>
+        <p class="text-purple-400">Backend Developer</p>
+        <p class="text-gray-400 text-sm">bob.smith@crybug.com</p>
+      </div>
+      
+      <div class="border-t border-gray-700 pt-3">
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Projects</span>
+          <span>3</span>
+        </div>
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Bugs Fixed</span>
+          <span>27</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-400">Joined</span>
+          <span>Mar 5, 2024</span>
+        </div>
+      </div>
+      
+      <div class="team-member-actions">
+        <button class="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1 rounded-lg promote-btn" data-member="Bob Smith">
+          <i class="fas fa-arrow-up mr-1"></i> Promote
+        </button>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-lg salary-btn" data-member="Bob Smith">
+          <i class="fas fa-dollar-sign mr-1"></i> Salary
+        </button>
+        <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded-lg remove-btn" data-member="Bob Smith">
+          <i class="fas fa-user-minus mr-1"></i> Remove
+        </button>
+      </div>
+    </div>
+    
+    <!-- Team Member 3 -->
+    <div class="bg-gray-800 rounded-xl p-5 card-hover team-member-card">
+      <div class="flex justify-center mb-4">
+        <img src="/api/placeholder/100/100" alt="Carol Davis" class="w-24 h-24 rounded-full border-4 border-gray-700">
+      </div>
+      <div class="text-center mb-4">
+        <h3 class="text-lg font-bold">Carol Davis</h3>
+        <p class="text-green-400">QA Tester</p>
+        <p class="text-gray-400 text-sm">carol.davis@crybug.com</p>
+      </div>
+      
+      <div class="border-t border-gray-700 pt-3">
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Projects</span>
+          <span>5</span>
+        </div>
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Bugs Found</span>
+          <span>48</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-400">Joined</span>
+          <span>Nov 20, 2023</span>
+        </div>
+      </div>
+      
+      <div class="team-member-actions">
+        <button class="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1 rounded-lg promote-btn" data-member="Carol Davis">
+          <i class="fas fa-arrow-up mr-1"></i> Promote
+        </button>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-lg salary-btn" data-member="Carol Davis">
+          <i class="fas fa-dollar-sign mr-1"></i> Salary
+        </button>
+        <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded-lg remove-btn" data-member="Carol Davis">
+          <i class="fas fa-user-minus mr-1"></i> Remove
+        </button>
+      </div>
+    </div>
+    
+    <!-- Team Member 4 -->
+    <div class="bg-gray-800 rounded-xl p-5 card-hover team-member-card">
+      <div class="flex justify-center mb-4">
+        <img src="/api/placeholder/100/100" alt="David Wilson" class="w-24 h-24 rounded-full border-4 border-gray-700">
+      </div>
+      <div class="text-center mb-4">
+        <h3 class="text-lg font-bold">David Wilson</h3>
+        <p class="text-red-400">Project Manager</p>
+        <p class="text-gray-400 text-sm">david.wilson@crybug.com</p>
+      </div>
+      
+      <div class="border-t border-gray-700 pt-3">
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Projects</span>
+          <span>6</span>
+        </div>
+        <div class="flex justify-between text-sm mb-2">
+          <span class="text-gray-400">Team Size</span>
+          <span>8</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-400">Joined</span>
+          <span>Jul 8, 2023</span>
+        </div>
+      </div>
+      
+      <div class="team-member-actions">
+        <button class="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1 rounded-lg promote-btn" data-member="David Wilson">
+          <i class="fas fa-arrow-up mr-1"></i> Promote
+        </button>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white text-sm px-3 py-1 rounded-lg salary-btn" data-member="David Wilson">
+          <i class="fas fa-dollar-sign mr-1"></i> Salary
+        </button>
+        <button class="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded-lg remove-btn" data-member="David Wilson">
+          <i class="fas fa-user-minus mr-1"></i> Remove
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- Add Member Modal -->
+<div id="addMemberModal" class="modal">
+<div class="modal-content glass-effect p-6">
+    <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-white"><i class="fas fa-user-plus mr-2"></i>Add Team Member</h2>
+    <button class="close-modal text-gray-400 hover:text-white">
+        <i class="fas fa-times"></i>
+    </button>
+    </div>
+    <form id="addMemberForm">
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Full Name*</label>
+        <input type="text" name="fullName" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" placeholder="Enter full name">
+        <span class="error-msg" id="nameError">Name is required</span>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Email Address*</label>
+        <input type="email" name="email" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" placeholder="Enter email address">
+        <span class="error-msg" id="emailError">Valid email is required</span>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+        <label class="block text-gray-400 text-sm font-medium mb-2">Role*</label>
+        <select name="role" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+            <option value="">Select Role</option>
+            <option value="frontend">Frontend Developer</option>
+            <option value="backend">Backend Developer</option>
+            <option value="qa">QA Tester</option>
+            <option value="designer">Designer</option>
+            <option value="pm">Project Manager</option>
+        </select>
+        <span class="error-msg" id="roleError">Role is required</span>
+        </div>
+        <div>
+        <label class="block text-gray-400 text-sm font-medium mb-2">Department</label>
+        <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+            <option value="engineering">Engineering</option>
+            <option value="design">Design</option>
+            <option value="product">Product</option>
+            <option value="management">Management</option>
+        </select>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+        <label class="block text-gray-400 text-sm font-medium mb-2">Experience (Years)*</label>
+        <input type="number" name="experience" min="0" max="50" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+        <span class="error-msg" id="experienceError">Valid experience is required</span>
+        </div>
+        <div>
+        <label class="block text-gray-400 text-sm font-medium mb-2">Start Date*</label>
+        <input type="date" name="startDate" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+        <span class="error-msg" id="dateError">Valid date is required</span>
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Profile Picture</label>
+        <div class="border border-dashed border-gray-700 rounded p-4 text-center bg-gray-900 hover:bg-gray-800 cursor-pointer">
+        <i class="fas fa-user-circle text-2xl text-gray-400 mb-2"></i>
+        <p class="text-gray-400 text-sm">Click to upload profile picture</p>
+        <input type="file" class="hidden" accept="image/*">
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Skills & Expertise</label>
+        <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="3" placeholder="List key skills and expertise..."></textarea>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Initial Projects</label>
+        <select multiple class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" size="3">
+        <option>Project Alpha</option>
+        <option>Project Beta</option>
+        <option>Project Gamma</option>
+        <option>Project Delta</option>
+        </select>
+        <p class="text-gray-400 text-xs mt-1">Hold Ctrl/Cmd to select multiple projects</p>
+    </div>
+    
+    <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="close-modal bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Cancel</button>
+        <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Add Member</button>
+    </div>
+    </form>
+</div>
+</div>
+
+<!-- Promote Modal -->
+<div id="promoteModal" class="modal">
+<div class="modal-content glass-effect p-6">
+    <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-white"><i class="fas fa-arrow-up mr-2"></i>Promote Team Member</h2>
+    <button class="close-modal text-gray-400 hover:text-white">
+        <i class="fas fa-times"></i>
+    </button>
+    </div>
+    <div class="mb-4">
+    <p class="text-gray-200">You are about to promote: <span id="promoteModalName" class="font-bold"></span></p>
+    </div>
+    <form id="promoteForm">
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">New Role*</label>
+        <select name="newRole" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+        <option value="">Select New Role</option>
+        <option value="senior-frontend">Senior Frontend Developer</option>
+        <option value="senior-backend">Senior Backend Developer</option>
+        <option value="qa-lead">QA Lead</option>
+        <option value="design-lead">Design Lead</option>
+        <option value="tech-lead">Technical Lead</option>
+        <option value="project-manager">Project Manager</option>
+        </select>
+        <span class="error-msg" id="newRoleError">New role is required</span>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Effective Date*</label>
+        <input type="date" name="effectiveDate" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+        <span class="error-msg" id="effectiveDateError">Effective date is required</span>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Promotion Reason</label>
+        <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="3" placeholder="Reason for promotion..."></textarea>
+    </div>
+    
+    <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="close-modal bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Cancel</button>
+        <button type="submit" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Confirm Promotion</button>
+    </div>
+    </form>
+</div>
+</div>
+
+<!-- Salary Increase Modal -->
+<div id="salaryModal" class="modal">
+<div class="modal-content glass-effect p-6">
+    <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-bold text-white"><i class="fas fa-dollar-sign mr-2"></i>Salary Increase</h2>
+    <button class="close-modal text-gray-400 hover:text-white">
+        <i class="fas fa-times"></i>
+    </button>
+    </div>
+    <div class="mb-4">
+    <p class="text-gray-200">You are about to adjust salary for: <span id="salaryModalName" class="font-bold"></span></p>
+    </div>
+    <form id="salaryForm">
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Current Salary</label>
+        <input type="text" class="w-full bg-gray-800 text-white border border-gray-700 rounded p-2" value="$75,000" disabled>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">New Salary*</label>
+        <input type="number" name="newSalary" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" placeholder="Enter new salary">
+        <span class="error-msg" id="salaryError">Valid salary amount is required</span>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Effective Date*</label>
+
+        
+        <input type="date" name="salaryDate" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+        <span class="error-msg" id="salaryDateError">Effective date is required</span>
+        </div>
+
+        <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Reason for Adjustment</label>
+        <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="3" placeholder="Reason for salary increase..."></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="close-modal bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Cancel</button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">Confirm Adjustment</button>
+        </div>
+        </form>
+        </div>
+        </div>
+
+        <!-- Remove Member Modal -->
+        <div id="removeModal" class="modal">
+        <div class="modal-content glass-effect p-6">
+        <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-white"><i class="fas fa-user-minus mr-2"></i>Remove Team Member</h2>
+        <button class="close-modal text-gray-400 hover:text-white">
+        <i class="fas fa-times"></i>
+        </button>
+        </div>
+        <div class="mb-6 text-center">
+        <div class="bg-red-500 bg-opacity-20 p-3 inline-block rounded-full mb-4">
+        <i class="fas fa-exclamation-triangle text-red-400 text-3xl"></i>
+        </div>
+        <p class="text-gray-200 text-lg mb-2">Are you sure you want to remove <span id="removeModalName" class="font-bold"></span>?</p>
+        <p class="text-gray-400">This action cannot be undone. All data associated with this team member will be permanently removed.</p>
+        </div>
+        <form id="removeForm">
+        <div class="mb-4">
+        <label class="block text-gray-400 text-sm font-medium mb-2">Reason for Removal</label>
+        <textarea name="removeReason" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="3" placeholder="Please provide a reason..."></textarea>
+        </div>
+
+        <div class="mb-4">
+        <label class="flex items-center text-gray-400 text-sm">
+        <input type="checkbox" name="transferProjects" class="mr-2">
+        Transfer projects to another team member
+        </label>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-6">
+        <button type="button" class="close-modal bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Cancel</button>
+        <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Remove Member</button>
+        </div>
+        </form>
+        </div>
+        </div>
+
+        <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const menuToggleBtn = document.querySelector('.menu-toggle');
+  const closeSidebarBtn = document.getElementById('closeSidebar');
+  
+  // Toggle sidebar on menu button click
+  menuToggleBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('active');
+    sidebarOverlay.classList.toggle('active');
+  });
+  
+  // Close sidebar when overlay is clicked
+  sidebarOverlay.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+  });
+  
+  // Close sidebar when close button is clicked
+  closeSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+  });
+});
+        document.addEventListener("DOMContentLoaded", () => {
+        // Modal functionality
+        const addMemberBtn = document.getElementById('addMemberBtn');
+        const addMemberModal = document.getElementById('addMemberModal');
+        const promoteModal = document.getElementById('promoteModal');
+        const salaryModal = document.getElementById('salaryModal');
+        const removeModal = document.getElementById('removeModal');
+        const allModals = [addMemberModal, promoteModal, salaryModal, removeModal];
+
+        // Open the add member modal
+        addMemberBtn.addEventListener('click', () => {
+        openModal(addMemberModal);
+        });
+
+        // Close buttons for all modals
+        document.querySelectorAll('.close-modal').forEach(closeBtn => {
+        closeBtn.addEventListener('click', () => {
+        const modal = closeBtn.closest('.modal');
+        closeModal(modal);
+        });
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+        allModals.forEach(modal => {
+        if (e.target === modal) {
+        closeModal(modal);
+        }
+        });
+        });
+
+        // Function to open modal
+        function openModal(modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => {
+        modal.querySelector('.modal-content').style.opacity = '1';
+        }, 10);
+        }
+
+        // Function to close modal
+        function closeModal(modal) {
+        modal.querySelector('.modal-content').style.opacity = '0';
+        setTimeout(() => {
+        modal.style.display = 'none';
+        }, 300);
+        }
+
+        // Promote button functionality
+        document.querySelectorAll('.promote-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const memberName = btn.getAttribute('data-member');
+        document.getElementById('promoteModalName').textContent = memberName;
+        openModal(promoteModal);
+        });
+        });
+
+        // Salary increase button functionality
+        document.querySelectorAll('.salary-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const memberName = btn.getAttribute('data-member');
+        document.getElementById('salaryModalName').textContent = memberName;
+        openModal(salaryModal);
+        });
+        });
+
+        // Remove button functionality
+        document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const memberName = btn.getAttribute('data-member');
+        document.getElementById('removeModalName').textContent = memberName;
+        openModal(removeModal);
+        });
+        });
+
+        // Mobile menu toggle
+        const menuToggleBtns = document.querySelectorAll('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+
+        menuToggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        });
+        });
+
+        // Form validations
+        const addMemberForm = document.getElementById('addMemberForm');
+        const promoteForm = document.getElementById('promoteForm');
+        const salaryForm = document.getElementById('salaryForm');
+        const removeForm = document.getElementById('removeForm');
+
+        // Add member form validation
+        addMemberForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        let isValid = true;
+
+        // Validate name
+        const nameInput = addMemberForm.querySelector('input[name="fullName"]');
+        if (!nameInput.value.trim()) {
+        document.getElementById('nameError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('nameError').style.display = 'none';
+        }
+
+        // Validate email
+        const emailInput = addMemberForm.querySelector('input[name="email"]');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailInput.value.trim())) {
+        document.getElementById('emailError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('emailError').style.display = 'none';
+        }
+
+        // Validate role
+        const roleInput = addMemberForm.querySelector('select[name="role"]');
+        if (!roleInput.value) {
+        document.getElementById('roleError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('roleError').style.display = 'none';
+        }
+
+        // Validate experience
+        const experienceInput = addMemberForm.querySelector('input[name="experience"]');
+        if (experienceInput.value === '' || isNaN(experienceInput.value) || experienceInput.value < 0) {
+        document.getElementById('experienceError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('experienceError').style.display = 'none';
+        }
+
+        // Validate date
+        const dateInput = addMemberForm.querySelector('input[name="startDate"]');
+        if (!dateInput.value) {
+        document.getElementById('dateError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('dateError').style.display = 'none';
+        }
+
+        // If form is valid, submit and close modal
+        if (isValid) {
+        // Form is valid, you can submit the data or process it here
+        closeModal(addMemberModal);
+
+        // Show success message
+        alert('Team member added successfully!');
+
+        // Reset form
+        addMemberForm.reset();
+        }
+        });
+
+        // Promote form validation
+        promoteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        let isValid = true;
+
+        // Validate new role
+        const newRoleInput = promoteForm.querySelector('select[name="newRole"]');
+        if (!newRoleInput.value) {
+        document.getElementById('newRoleError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('newRoleError').style.display = 'none';
+        }
+
+        // Validate effective date
+        const effectiveDateInput = promoteForm.querySelector('input[name="effectiveDate"]');
+        if (!effectiveDateInput.value) {
+        document.getElementById('effectiveDateError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('effectiveDateError').style.display = 'none';
+        }
+
+        if (isValid) {
+        closeModal(promoteModal);
+        alert('Team member promoted successfully!');
+        promoteForm.reset();
+        }
+        });
+
+        // Salary form validation
+        salaryForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        let isValid = true;
+
+        // Validate new salary
+        const salaryInput = salaryForm.querySelector('input[name="newSalary"]');
+        if (!salaryInput.value || isNaN(salaryInput.value) || salaryInput.value <= 0) {
+        document.getElementById('salaryError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('salaryError').style.display = 'none';
+        }
+
+        // Validate effective date
+        const salaryDateInput = salaryForm.querySelector('input[name="salaryDate"]');
+        if (!salaryDateInput.value) {
+        document.getElementById('salaryDateError').style.display = 'block';
+        isValid = false;
+        } else {
+        document.getElementById('salaryDateError').style.display = 'none';
+        }
+
+        if (isValid) {
+        closeModal(salaryModal);
+        alert('Salary adjustment processed successfully!');
+        salaryForm.reset();
+        }
+        });
+
+        // Remove member form submission
+        removeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        closeModal(removeModal);
+        alert('Team member removed successfully!');
+        removeForm.reset();
+        });
+        });
+
+
+
+</script>
+</body>
+</html>

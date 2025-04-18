@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus | Company Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+
+</head>
+<body class="bg-gradient-custom text-white min-h-screen font-sans bg-black antialiased">
+
+  <div class="overlay" id="sidebarOverlay"></div>
+  
+  <div class="flex flex-col md:flex-row">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+      <div class="flex items-center justify-between mb-8 p-2">
+        <div class="flex items-center">
+            <i class="fas fa-bug text-indigo-500 text-2xl mr-2"></i>
+            <h1 class="text-xl font-bold text-indigo-500">CryBug</h1>
+          </div>
+        <button class="close-sidebar md:hidden text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <nav>
+        <ul class="space-y-2">
+          <li>
+            <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+              <i class="fas fa-home mr-3"></i>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="dashboard.html" class="sidebar-link  flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+              <i class="fas fa-tachometer-alt mr-3"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="team.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Clients">
+              <i class="fas fa-users mr-3"></i>
+              <span>Team</span>
+            </a>
+          </li>
+          <li>
+            <a href="analysis.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Analytics">
+              <i class="fas fa-chart-bar mr-3"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a href="settings.html" class="sidebar-link active flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+              <i class="fas fa-cog mr-3"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="mt-auto pt-8">
+        <div class="border-t border-gray-700 pt-4">
+          <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+            <i class="fas fa-question-circle mr-3"></i>
+            <span>Help Center</span>
+          </a>
+          <button class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 p-2 rounded flex items-center justify-center">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+
+      <!-- Mobile Menu Toggle -->
+       <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Top Bar -->
+
+      <!-- Settings Section (to be added to your existing dashboard) -->
+<!-- Settings Section (to be added to your existing dashboard) -->
+<div class="bg-gray-800 rounded-xl p-6 mb-8 card-hover">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="font-bold text-lg">Company Settings</h3>
+      <button class="text-gray-400 hover:text-white">
+        <i class="fas fa-cog"></i>
+      </button>
+    </div>
+    
+    <!-- Settings Tabs -->
+    <div class="border-b border-gray-700 mb-6">
+      <div class="flex gap-5">
+        <button class="tab-button active" data-settings-tab="companyInfoTab">
+          <i class="fas fa-building mr-2"></i> Company Info
+        </button>
+        <button class="tab-button" data-settings-tab="securityTab">
+          <i class="fas fa-lock mr-2"></i> Security
+        </button>
+      </div>
+    </div>
+    
+    <!-- Company Info Tab -->
+    <div id="companyInfoTab" class="settings-tab-content active">
+      <form>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Company Logo Upload -->
+          <div class="col-span-2">
+            <label class="block text-gray-300 text-sm font-medium mb-2">Company Logo</label>
+            <div class="flex items-center space-x-4">
+              <div class="bg-gray-900 rounded-lg p-4 flex items-center justify-center w-24 h-24">
+                <img src="/api/placeholder/96/96" alt="Company Logo" class="max-w-full max-h-full" id="previewLogo">
+              </div>
+              <div class="flex-1">
+                <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-800 transition-all" id="logoUploadArea">
+                  <i class="fas fa-cloud-upload-alt text-indigo-500 text-xl mb-2"></i>
+                  <p class="text-sm text-gray-400">Drag & drop your logo or</p>
+                  <button type="button" class="mt-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm">Browse Files</button>
+                  <input type="file" accept="image/*" class="hidden" id="logoUpload">
+                </div>
+                <p class="text-xs text-gray-500 mt-2">Recommended: 512x512px, PNG or SVG</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Company Details -->
+          <div>
+            <label class="block text-gray-300 text-sm font-medium mb-2">Company Name</label>
+            <input type="text" value="CryBug" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500">
+          </div>
+          
+          <div>
+            <label class="block text-gray-300 text-sm font-medium mb-2">Display Name</label>
+            <input type="text" value="CryBug" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500">
+          </div>
+          
+          <div>
+            <label class="block text-gray-300 text-sm font-medium mb-2">Email Address</label>
+            <input type="email" value="contact@crybug.com" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500">
+          </div>
+          
+          <div>
+            <label class="block text-gray-300 text-sm font-medium mb-2">Phone</label>
+            <input type="tel" value="+1 (555) 123-4567" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500">
+          </div>
+          
+          <div class="col-span-2">
+            <label class="block text-gray-300 text-sm font-medium mb-2">Address</label>
+            <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 focus:outline-none focus:border-indigo-500" rows="2">123 Tech Street, Silicon Valley, CA 94024</textarea>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="flex justify-end gap-4 mt-6">
+          <button type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded font-medium">Reset</button>
+          <button type="button" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded font-medium">Save Changes</button>
+        </div>
+      </form>
+    </div>
+    
+    <!-- Security Tab (Password Change) -->
+    <div id="securityTab" class="settings-tab-content hidden">
+      <form>
+        <div class="max-w-md mx-auto">
+          <div class="mb-6">
+            <label class="block text-gray-300 text-sm font-medium mb-2">Current Password</label>
+            <div class="relative">
+              <input type="password" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 pr-10 focus:outline-none focus:border-indigo-500" placeholder="Enter current password">
+              <button type="button" class="toggle-password absolute right-3 top-3 text-gray-400">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-gray-300 text-sm font-medium mb-2">New Password</label>
+            <div class="relative">
+              <input type="password" id="newPassword" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 pr-10 focus:outline-none focus:border-indigo-500" placeholder="Enter new password">
+              <button type="button" class="toggle-password absolute right-3 top-3 text-gray-400">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+            <div class="mt-2">
+              <div class="password-strength-meter bg-gray-700 h-1 rounded-full mt-2 overflow-hidden">
+                <div class="password-strength-fill bg-red-500 h-full rounded-full" style="width: 0%"></div>
+              </div>
+            
+            </div>
+          </div>
+          
+          <div class="mb-6">
+            <label class="block text-gray-300 text-sm font-medium mb-2">Confirm New Password</label>
+            <div class="relative">
+              <input type="password" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-3 pr-10 focus:outline-none focus:border-indigo-500" placeholder="Confirm new password">
+              <button type="button" class="toggle-password absolute right-3 top-3 text-gray-400">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          </div>
+          
+          
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-4 mt-6">
+            <button type="button" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded font-medium">Cancel</button>
+            <button type="button" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded font-medium">Change Password</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Add this to your existing JavaScript -->
+  <script>
+    // Logo upload preview functionality
+    const logoUpload = document.getElementById('logoUpload');
+    const logoUploadArea = document.getElementById('logoUploadArea');
+    const previewLogo = document.getElementById('previewLogo');
+    
+    logoUploadArea.addEventListener('click', () => {
+      logoUpload.click();
+    });
+    
+    logoUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      logoUploadArea.classList.add('border-indigo-500');
+    });
+    
+    logoUploadArea.addEventListener('dragleave', () => {
+      logoUploadArea.classList.remove('border-indigo-500');
+    });
+    
+    logoUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      logoUploadArea.classList.remove('border-indigo-500');
+      
+      if (e.dataTransfer.files.length) {
+        handleLogoFile(e.dataTransfer.files[0]);
+      }
+    });
+    
+    logoUpload.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        handleLogoFile(e.target.files[0]);
+      }
+    });
+    
+    function handleLogoFile(file) {
+      // Here you would normally upload the file to a server
+      // For this example, we'll just show a preview
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        previewLogo.src = e.target.result;
+      };
+      
+      reader.readAsDataURL(file);
+    }
+    
+    // Settings tab functionality
+    document.querySelectorAll('[data-settings-tab]').forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('[data-settings-tab]').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.settings-tab-content').forEach(content => content.classList.add('hidden'));
+        document.querySelectorAll('.settings-tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        button.classList.add('active');
+        const tabId = button.dataset.settingsTab;
+        const tabContent = document.getElementById(tabId);
+        tabContent.classList.remove('hidden');
+        tabContent.classList.add('active');
+      });
+    });
+    
+    // Password visibility toggle
+    document.querySelectorAll('.toggle-password').forEach(button => {
+      button.addEventListener('click', () => {
+        const input = button.previousElementSibling;
+        const icon = button.querySelector('i');
+        
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+        } else {
+          input.type = 'password';
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+        }
+      });
+    });
+    
+  </script>
+
+  </main>
+      
+  
+</body>
+</html>

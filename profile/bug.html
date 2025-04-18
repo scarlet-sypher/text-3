@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryBug | Bug Tracking</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+  
+  <style>
+    /* Custom styles for the modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      max-width: 90%;
+      width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .glass-effect {
+      background-color: rgba(23, 25, 35, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Gradient background */
+    .bg-gradient-custom {
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+    
+    /* Card hover effects */
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Active state for sidebar links */
+    .sidebar-link.active {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-left: 3px solid #ef4444;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-custom text-white min-h-screen font-sans antialiased">
+
+    <div class="overlay" id="sidebarOverlay"></div>
+    
+  <div class="flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+        <div class="flex items-center justify-between mb-8 p-2">
+          <div class="flex items-center">
+            <i class="fas fa-bug text-red-500 text-2xl mr-2"></i>
+            <h1 class="text-xl font-bold text-red-500">CryBug</h1>
+          </div>
+          <button class="close-sidebar md:hidden text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <nav>
+          <ul class="space-y-2">
+            <li>
+              <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+                <i class="fas fa-home mr-3"></i>
+                <span>Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="dashboard.html" class="sidebar-link  flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+                <i class="fas fa-tachometer-alt mr-3"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="project.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Projects" data-section="projects-section">
+                <i class="fas fa-project-diagram mr-3"></i>
+                <span>Projects</span>
+              </a>
+            </li>
+            <li>
+              <a href="bug.html" class="sidebar-link active flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Bugs">
+                <i class="fas fa-bug mr-3"></i>
+                <span>Bugs</span>
+              </a>
+            </li>
+            <li>
+              <a href="team.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Team">
+                <i class="fas fa-users mr-3"></i>
+                <span>Team</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="setting.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+                <i class="fas fa-cog mr-3"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="mt-auto pt-8">
+          <div class="border-t border-gray-700 pt-4">
+            <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+              <i class="fas fa-question-circle mr-3"></i>
+              <span>Help Center</span>
+            </a>
+            <button class="mt-4 w-full bg-red-600 hover:bg-red-700 p-2 rounded flex items-center justify-center">
+              <i class="fas fa-sign-out-alt mr-2"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+    <!-- Main Content Area -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+
+        <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+            <i class="fas fa-bars"></i>
+          </button>
+      <!-- Page Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 ">
+        <div class="flex flex-col gap-2">
+          <h1 class="text-2xl md:text-3xl font-bold">Bug Tracking</h1>
+          <p class="text-gray-400" id="currentDateTime">Loading date...</p>
+          <p class="text-gray-400">Track, manage and resolve bugs across all projects</p>
+          
+        </div>
+        
+        <button class="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 px-4 py-2 rounded flex items-center" id="reportBugBtn">
+          <i class="fas fa-plus mr-2"></i> Report Bug
+        </button>
+      </div>
+      
+      <!-- Bug Filter Row -->
+      <div class="bg-gray-800 p-4 rounded-xl mb-6">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <input type="text" placeholder="Search bugs..." class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+          </div>
+          <div class="flex gap-2">
+            <select class="bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>All Status</option>
+              <option>Open</option>
+              <option>In Progress</option>
+              <option>Resolved</option>
+            </select>
+            <select class="bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>All Priority</option>
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Bugs Table -->
+      <div class="bg-gray-800 rounded-xl overflow-hidden mb-8">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-gray-900">
+              <th class="py-3 px-4 text-left">ID</th>
+              <th class="py-3 px-4 text-left">Title</th>
+              <th class="py-3 px-4 text-left">Project</th>
+              <th class="py-3 px-4 text-left">Status</th>
+              <th class="py-3 px-4 text-left">Priority</th>
+              <th class="py-3 px-4 text-left">Assigned To</th>
+              <th class="py-3 px-4 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-t border-gray-700 hover:bg-gray-700">
+              <td class="py-3 px-4">BG-101</td>
+              <td class="py-3 px-4">Login page not responsive on mobile</td>
+              <td class="py-3 px-4">Project Alpha</td>
+              <td class="py-3 px-4"><span class="bg-blue-500 text-xs px-2 py-1 rounded-full">In Progress</span></td>
+              <td class="py-3 px-4"><span class="bg-red-500 text-xs px-2 py-1 rounded-full">High</span></td>
+              <td class="py-3 px-4">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/30/30" alt="User" class="w-6 h-6 rounded-full mr-2">
+                  <span>Alice Johnson</span>
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex space-x-2">
+                  <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                  <button class="text-green-400 hover:text-green-300"><i class="fas fa-check-circle"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr class="border-t border-gray-700 hover:bg-gray-700">
+              <td class="py-3 px-4">BG-102</td>
+              <td class="py-3 px-4">Password reset email not received</td>
+              <td class="py-3 px-4">Project Alpha</td>
+              <td class="py-3 px-4"><span class="bg-yellow-500 text-xs px-2 py-1 rounded-full">Open</span></td>
+              <td class="py-3 px-4"><span class="bg-yellow-500 text-xs px-2 py-1 rounded-full">Medium</span></td>
+              <td class="py-3 px-4">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/30/30" alt="User" class="w-6 h-6 rounded-full mr-2">
+                  <span>Bob Smith</span>
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex space-x-2">
+                  <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                  <button class="text-green-400 hover:text-green-300"><i class="fas fa-check-circle"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr class="border-t border-gray-700 hover:bg-gray-700">
+              <td class="py-3 px-4">BG-103</td>
+              <td class="py-3 px-4">Theme toggle not working in dark mode</td>
+              <td class="py-3 px-4">Project Beta</td>
+              <td class="py-3 px-4"><span class="bg-green-500 text-xs px-2 py-1 rounded-full">Resolved</span></td>
+              <td class="py-3 px-4"><span class="bg-green-500 text-xs px-2 py-1 rounded-full">Low</span></td>
+              <td class="py-3 px-4">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/30/30" alt="User" class="w-6 h-6 rounded-full mr-2">
+                  <span>Carol Davis</span>
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex space-x-2">
+                  <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                  <button class="text-purple-400 hover:text-purple-300"><i class="fas fa-redo"></i></button>
+                </div>
+              </td>
+            </tr>
+            <tr class="border-t border-gray-700 hover:bg-gray-700">
+              <td class="py-3 px-4">BG-104</td>
+              <td class="py-3 px-4">Export button freezes the application</td>
+              <td class="py-3 px-4">Project Gamma</td>
+              <td class="py-3 px-4"><span class="bg-blue-500 text-xs px-2 py-1 rounded-full">In Progress</span></td>
+              <td class="py-3 px-4"><span class="bg-red-500 text-xs px-2 py-1 rounded-full">High</span></td>
+              <td class="py-3 px-4">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/30/30" alt="User" class="w-6 h-6 rounded-full mr-2">
+                  <span>David Wilson</span>
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex space-x-2">
+                  <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                  <button class="text-green-400 hover:text-green-300"><i class="fas fa-check-circle"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Bug Statistics -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+          <div class="rounded-lg bg-yellow-500 bg-opacity-20 p-3 mr-4">
+            <i class="fas fa-exclamation-circle text-yellow-400 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-400 text-sm">Open Bugs</p>
+            <p class="text-xl font-bold">12</p>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+          <div class="rounded-lg bg-blue-500 bg-opacity-20 p-3 mr-4">
+            <i class="fas fa-spinner text-blue-400 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-400 text-sm">In Progress</p>
+            <p class="text-xl font-bold">8</p>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+          <div class="rounded-lg bg-green-500 bg-opacity-20 p-3 mr-4">
+            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-400 text-sm">Resolved</p>
+            <p class="text-xl font-bold">24</p>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 p-4 rounded-xl flex items-center">
+          <div class="rounded-lg bg-red-500 bg-opacity-20 p-3 mr-4">
+            <i class="fas fa-fire text-red-400 text-xl"></i>
+          </div>
+          <div>
+            <p class="text-gray-400 text-sm">High Priority</p>
+            <p class="text-xl font-bold">5</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Report Bug Modal -->
+  <div id="reportBugModal" class="modal">
+    <div class="modal-content glass-effect p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold text-white"><i class="fas fa-bug mr-2"></i>Report New Bug</h2>
+        <button class="close-modal text-gray-400 hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form>
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm font-medium mb-2">Bug Title</label>
+          <input type="text" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" placeholder="Short bug description">
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-gray-400 text-sm font-medium mb-2">Project</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>Select Project</option>
+              <option>Project Alpha</option>
+              <option>Project Beta</option>
+              <option>Project Gamma</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-400 text-sm font-medium mb-2">Priority</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option value="high">High</option>
+              <option value="medium" selected>Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-gray-400 text-sm font-medium mb-2">Bug Type</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>UI/UX Issue</option>
+              <option>Functionality</option>
+              <option>Performance</option>
+              <option>Security</option>
+              <option>Compatibility</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-gray-400 text-sm font-medium mb-2">Environment</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>Development</option>
+              <option>Testing</option>
+              <option>Staging</option>
+              <option>Production</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm font-medium mb-2">Bug Description</label>
+          <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="4" placeholder="Detailed description of the bug..."></textarea>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm font-medium mb-2">Steps to Reproduce</label>
+          <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="3" placeholder="1. Navigate to page..."></textarea>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm font-medium mb-2">Expected vs. Actual Behavior</label>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="2" placeholder="Expected behavior..."></textarea>
+            <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="2" placeholder="Actual behavior..."></textarea>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm font-medium mb-2">Browser/Device Info</label>
+          <input type="text" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" placeholder="E.g., Chrome 101, Windows 10, iPhone 13, etc.">
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm font-medium mb-2">Assign To</label>
+          <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+            <option>Select Team Member</option>
+            <option>Alice Johnson</option>
+            <option>Bob Smith</option>
+            <option>Carol Davis</option>
+          </select>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-gray-400 text-sm font-medium mb-2">Attachments</label>
+          <div class="border border-dashed border-gray-700 rounded p-4 text-center bg-gray-900 hover:bg-gray-800 cursor-pointer">
+            <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+            <p class="text-gray-400 text-sm">Click to upload screenshots or files</p>
+            <input type="file" class="hidden" multiple>
+          </div>
+        </div>
+        
+        <div class="flex justify-end gap-2 mt-6">
+          <button type="button" class="close-modal bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Cancel</button>
+          <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Submit Bug</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Modal functionality for Report Bug button
+      const reportBugBtn = document.getElementById('reportBugBtn');
+      const reportBugModal = document.getElementById('reportBugModal');
+      const closeModalBtns = reportBugModal.querySelectorAll('.close-modal');
+      
+      // Open the modal when the Report Bug button is clicked
+      reportBugBtn.addEventListener('click', () => {
+        reportBugModal.style.display = 'flex';
+        setTimeout(() => {
+          reportBugModal.querySelector('.modal-content').style.opacity = '1';
+        }, 10);
+      });
+      
+      // Close the modal when the close buttons are clicked
+      closeModalBtns.forEach(closeBtn => {
+        closeBtn.addEventListener('click', () => {
+          reportBugModal.querySelector('.modal-content').style.opacity = '0';
+          setTimeout(() => {
+            reportBugModal.style.display = 'none';
+          }, 300);
+        });
+      });
+      
+      // Close the modal when clicking outside the modal content
+      window.addEventListener('click', (e) => {
+        if (e.target === reportBugModal) {
+          reportBugModal.querySelector('.modal-content').style.opacity = '0';
+          setTimeout(() => {
+            reportBugModal.style.display = 'none';
+          }, 300);
+        }
+      });
+
+      // Mobile menu toggle
+      const menuToggleBtns = document.querySelectorAll('.menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      
+      menuToggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          sidebar.classList.toggle('active');
+        });
+      });
+      
+      // Form validation
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault(); // Prevent the default form submission
+          
+          // Close the modal after submission
+          reportBugModal.querySelector('.modal-content').style.opacity = '0';
+          setTimeout(() => {
+            reportBugModal.style.display = 'none';
+          }, 300);
+          
+          // Optional: Show a success message
+          alert('Bug reported successfully!');
+        });
+      });
+    });
+  </script>
+</body>
+</html>

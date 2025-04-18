@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryBug | Help Center</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../src/output.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+  <style>
+   
+    .faq-item.active .faq-answer {
+      max-height: 500px;
+      opacity: 1;
+    }
+    .faq-item.active .faq-toggle i {
+      transform: rotate(180deg);
+    }
+    .faq-answer {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-gradient-custom text-white min-h-screen font-sans bg-black antialiased">
+
+  <div class="overlay" id="sidebarOverlay"></div>
+  
+  <div class="flex flex-col md:flex-row">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+      <div class="flex items-center justify-between mb-8 p-2">
+        <div class="flex items-center">
+          <i class="fas fa-bug text-green-500 text-2xl mr-2"></i>
+          <h1 class="text-xl font-bold text-green-500">CryBug</h1>
+        </div>
+        <button class="close-sidebar md:hidden text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <nav>
+        <ul class="space-y-2">
+          <li>
+            <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+              <i class="fas fa-home mr-3"></i>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="dashboard.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+              <i class="fas fa-tachometer-alt mr-3"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="project.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Projects">
+              <i class="fas fa-project-diagram mr-3"></i>
+              <span>Projects</span>
+            </a>
+          </li>
+          <li>
+            <a href="bug.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Bugs">
+              <i class="fas fa-bug mr-3"></i>
+              <span>Bugs</span>
+            </a>
+          </li>
+          <li>
+            <a href="update.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Reports">
+              <i class="fas fa-tasks mr-3"></i>
+              <span>Update Progress</span>
+            </a>
+          </li>
+          <li>
+            <a href="setting.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+              <i class="fas fa-cog mr-3"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="mt-auto pt-8">
+        <div class="border-t border-gray-700 pt-4">
+          <a href="help.html" class="sidebar-link active flex items-center p-3 rounded text-green-500 hover:text-white" data-title="Help Center">
+            <i class="fas fa-question-circle mr-3"></i>
+            <span>Help Center</span>
+          </a>
+          <button class="mt-4 w-full bg-green-600 hover:bg-green-700 p-2 rounded flex items-center justify-center">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Top Bar -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold">Help Center</h1>
+          <p class="text-gray-400" id="currentDateTime">April 18, 2025</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="notificationBtn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-dot"></span>
+            </button>
+          </div>
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="messageBtn">
+              <i class="fas fa-envelope"></i>
+            </button>
+          </div>
+          <div class="relative">
+            <button id="profileDropdownBtn" class="flex items-center">
+              <div class="h-10 w-10 rounded-full border-2 border-green-500 bg-gray-700 flex items-center justify-center">
+                <i class="fas fa-user text-gray-300"></i>
+              </div>
+              <i class="fas fa-chevron-down ml-2 text-xs text-gray-400"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Help Center Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Company Details -->
+        <div class="lg:col-span-1">
+          <div class="bg-gray-800 rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-bold flex items-center mb-4">
+              <i class="fas fa-building text-green-500 mr-2"></i>
+              Company Details
+            </h2>
+            <div class="space-y-4">
+              <div>
+                <h3 class="text-green-400 font-medium">BugSquashers Inc.</h3>
+                <p class="text-gray-300 text-sm">Premier Bug Tracking Solutions</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Address</p>
+                <p class="text-gray-300">123 Debugger Ave, Suite 404</p>
+                <p class="text-gray-300">San Francisco, CA 94107</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Contact</p>
+                <p class="text-gray-300">
+                  <i class="fas fa-phone-alt text-green-500 mr-2"></i>
+                  +1 (415) 555-0123
+                </p>
+                <p class="text-gray-300">
+                  <i class="fas fa-envelope text-green-500 mr-2"></i>
+                  support@bugsquashers.tech
+                </p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Hours of Operation</p>
+                <p class="text-gray-300">Monday - Friday: 9AM - 6PM PT</p>
+                <p class="text-gray-300">Weekend Support: 10AM - 4PM PT</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Support Manager -->
+          <div class="bg-gray-800 rounded-xl p-6">
+            <h2 class="text-xl font-bold flex items-center mb-4">
+              <i class="fas fa-user-headset text-green-500 mr-2"></i>
+              Support Manager
+            </h2>
+            <div class="flex flex-col items-center text-center mb-4">
+              <div class="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center mb-2">
+                <i class="fas fa-user text-2xl text-gray-300"></i>
+              </div>
+              <h3 class="text-lg font-medium">David Chen</h3>
+              <p class="text-green-400 text-sm">Head of Technical Support</p>
+            </div>
+            <div class="space-y-3">
+              <p class="text-gray-300 flex items-center">
+                <i class="fas fa-envelope text-green-500 mr-2 w-5"></i>
+                david.chen@bugsquashers.tech
+              </p>
+              <p class="text-gray-300 flex items-center">
+                <i class="fas fa-phone-alt text-green-500 mr-2 w-5"></i>
+                +1 (415) 555-0145
+              </p>
+              <p class="text-gray-300 flex items-center">
+                <i class="fab fa-slack text-green-500 mr-2 w-5"></i>
+                @david.chen
+              </p>
+              <div class="pt-4">
+                <button class="w-full bg-green-600 hover:bg-green-700 rounded py-2 flex items-center justify-center">
+                  <i class="fas fa-comment-alt mr-2"></i>
+                  Schedule a Call
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- FAQs and Ticket Form -->
+        <div class="lg:col-span-2">
+
+          <!-- FAQs Section -->
+          <div class="bg-gray-800 rounded-xl p-6 mb-6">
+            <h2 class="text-xl font-bold flex items-center mb-4">
+              <i class="fas fa-question-circle text-green-500 mr-2"></i>
+              Frequently Asked Questions
+            </h2>
+            
+            <div class="space-y-4">
+              <!-- FAQ Item 1 -->
+              <div class="faq-item border border-gray-700 rounded-lg">
+                <div class="flex justify-between items-center p-4 cursor-pointer faq-header">
+                  <h3 class="text-lg font-medium">How do I create a new project?</h3>
+                  <button class="faq-toggle text-gray-400">
+                    <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                  </button>
+                </div>
+                <div class="faq-answer bg-gray-700 p-4 rounded-b-lg">
+                  <p class="text-gray-300">
+                    To create a new project, navigate to the Projects page using the sidebar menu and click on the "Create New Project" button at the top right corner. Fill in the required information such as project name, description, and team members, then click "Create Project" to finalize.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- FAQ Item 2 -->
+              <div class="faq-item border border-gray-700 rounded-lg">
+                <div class="flex justify-between items-center p-4 cursor-pointer faq-header">
+                  <h3 class="text-lg font-medium">How do I assign bugs to team members?</h3>
+                  <button class="faq-toggle text-gray-400">
+                    <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                  </button>
+                </div>
+                <div class="faq-answer bg-gray-700 p-4 rounded-b-lg">
+                  <p class="text-gray-300">
+                    From the Bugs page, click on the bug you want to assign. In the bug details panel, look for the "Assignee" dropdown menu. Select the team member you want to assign the bug to and save your changes. The team member will receive a notification about the new assignment.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- FAQ Item 3 -->
+              <div class="faq-item border border-gray-700 rounded-lg">
+                <div class="flex justify-between items-center p-4 cursor-pointer faq-header">
+                  <h3 class="text-lg font-medium">How do I change my account password?</h3>
+                  <button class="faq-toggle text-gray-400">
+                    <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                  </button>
+                </div>
+                <div class="faq-answer bg-gray-700 p-4 rounded-b-lg">
+                  <p class="text-gray-300">
+                    To change your password, go to the Settings page using the sidebar menu. Click on the "Account Security" tab. Under the "Change Password" section, enter your current password, then your new password, and confirm it. Click "Update Password" to save your changes.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- FAQ Item 4 -->
+              <div class="faq-item border border-gray-700 rounded-lg">
+                <div class="flex justify-between items-center p-4 cursor-pointer faq-header">
+                  <h3 class="text-lg font-medium">Can I export bug reports?</h3>
+                  <button class="faq-toggle text-gray-400">
+                    <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                  </button>
+                </div>
+                <div class="faq-answer bg-gray-700 p-4 rounded-b-lg">
+                  <p class="text-gray-300">
+                    Yes, you can export bug reports in various formats including CSV, PDF, and Excel. From the Bugs page, use the filter options to select the bugs you want to include in your report, then click the "Export" button at the top right of the table. Choose your preferred format and download the report.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- FAQ Item 5 -->
+              <div class="faq-item border border-gray-700 rounded-lg">
+                <div class="flex justify-between items-center p-4 cursor-pointer faq-header">
+                  <h3 class="text-lg font-medium">How do I add team members to my project?</h3>
+                  <button class="faq-toggle text-gray-400">
+                    <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                  </button>
+                </div>
+                <div class="faq-answer bg-gray-700 p-4 rounded-b-lg">
+                  <p class="text-gray-300">
+                    Navigate to your project's details page by clicking on the project name from the Projects page. Go to the "Team" tab, then click "Add Member". You can search for existing users by email or name, or invite new users by entering their email address. Set their role and permissions, then click "Add" to send the invitation.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+              <a href="#" class="text-green-500 hover:text-green-400 inline-flex items-center">
+                See all FAQs
+                <i class="fas fa-arrow-right ml-2"></i>
+              </a>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+    </main>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+      
+      // FAQ toggles
+      const faqHeaders = document.querySelectorAll('.faq-header');
+      if (faqHeaders.length) {
+        faqHeaders.forEach(header => {
+          header.addEventListener('click', function() {
+            const faqItem = this.parentElement;
+            faqItem.classList.toggle('active');
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryBug | Employee Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- <link rel="stylesheet" href="../src/output.css"> -->
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+
+</head>
+<body class="bg-gradient-custom text-white min-h-screen font-sans bg-black antialiased">
+
+  <div class="overlay" id="sidebarOverlay"></div>
+  
+  <div class="flex flex-col md:flex-row">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+      <div class="flex items-center justify-between mb-8 p-2">
+        <div class="flex items-center">
+          <i class="fas fa-bug text-green-500 text-2xl mr-2"></i>
+          <h1 class="text-xl font-bold text-green-500">CryBug</h1>
+          
+        </div>
+        <button class="close-sidebar md:hidden text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <nav>
+        <ul class="space-y-2">
+          <li>
+            <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+              <i class="fas fa-home mr-3"></i>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="dashboard.html" class="sidebar-link active flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+              <i class="fas fa-tachometer-alt mr-3"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="project.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Projects">
+              <i class="fas fa-project-diagram mr-3"></i>
+              <span>Projects</span>
+            </a>
+          </li>
+          <li>
+            <a href="bug.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Bugs">
+              <i class="fas fa-bug mr-3"></i>
+              <span>Bugs</span>
+            </a>
+          </li>
+          <li>
+            <a href="update.html" class="sidebar-link  flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Reports">
+              <i class="fas fa-tasks mr-3"></i>
+              <span>Update Progress</span>
+            </a>
+          
+          </li>
+
+          <li>
+            <a href="setting.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+              <i class="fas fa-cog mr-3"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="mt-auto pt-8">
+        <div class="border-t border-gray-700 pt-4">
+          <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+            <i class="fas fa-question-circle mr-3"></i>
+            <span>Help Center</span>
+          </a>
+          <button class="mt-4 w-full bg-green-600 hover:bg-green-700 p-2 rounded flex items-center justify-center">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Top Bar -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold">Welcome Back, Sarah!</h1>
+          <p class="text-gray-400" id="currentDateTime">Loading date...</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="notificationBtn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-dot"></span>
+            </button>
+            <div class="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="notificationDropdown">
+              <div class="text-sm font-medium border-b border-gray-700 pb-2 mb-2">Notifications</div>
+              <div class="notification-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <span class="status-badge status-active mt-1"></span>
+                <div>
+                  <p class="text-sm">New bug assigned to you in Project Beta</p>
+                  <p class="text-xs text-gray-400">10 minutes ago</p>
+                </div>
+              </div>
+              <div class="notification-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <span class="status-badge status-pending mt-1"></span>
+                <div>
+                  <p class="text-sm">Team meeting at 2:00 PM</p>
+                  <p class="text-xs text-gray-400">1 hour ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="messageBtn">
+              <i class="fas fa-envelope"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="messageDropdown">
+              <div class="text-sm font-medium border-b border-gray-700 pb-2 mb-2">Messages</div>
+              <div class="message-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <img src="/api/placeholder/30/30" alt="John" class="w-8 h-8 rounded-full mr-2" />
+                <div>
+                  <p class="text-sm">John Doe</p>
+                  <p class="text-xs text-gray-400">Can you check the latest bug fix?</p>
+                </div>
+              </div>
+              <div class="message-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <img src="/api/placeholder/30/30" alt="Emma" class="w-8 h-8 rounded-full mr-2" />
+                <div>
+                  <p class="text-sm">Emma Wilson</p>
+                  <p class="text-xs text-gray-400">UX improvement suggestions</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <button id="profileDropdownBtn" class="flex items-center">
+              <img src="/api/placeholder/40/40" alt="Profile" class="h-10 w-10 rounded-full border-2 border-green-500" />
+              <i class="fas fa-chevron-down ml-2 text-xs text-gray-400"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="profileDropdown">
+              <a href="#" class="block p-2 hover:bg-gray-700 rounded text-sm">
+                <i class="fas fa-user mr-2"></i> My Profile
+              </a>
+              <a href="#" class="block p-2 hover:bg-gray-700 rounded text-sm text-green-400">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Stats Cards Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-blue-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-tasks text-blue-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">My Tasks</p>
+              <h3 class="text-xl font-bold">8</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-green-400">
+            <i class="fas fa-arrow-up mr-1"></i> 5% <span class="text-gray-400 ml-1">from last week</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-red-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-bug text-red-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Assigned Bugs</p>
+              <h3 class="text-xl font-bold">3</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-red-400">
+            <i class="fas fa-arrow-up mr-1"></i> 1% <span class="text-gray-400 ml-1">from yesterday</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-green-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-check-circle text-green-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Completed</p>
+              <h3 class="text-xl font-bold">12</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-green-400">
+            <i class="fas fa-arrow-up mr-1"></i> 15% <span class="text-gray-400 ml-1">from last week</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-purple-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-project-diagram text-purple-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Projects</p>
+              <h3 class="text-xl font-bold">2</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-gray-400">
+            <i class="fas fa-equals mr-1"></i> <span class="text-gray-400">No change</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profile Section -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center card-hover transition-all duration-300">
+          <div class="relative inline-block">
+            <img src="/api/placeholder/128/128" alt="Profile" class="w-32 h-32 mx-auto rounded-full border-4 border-green-500" />
+            <span class="absolute bottom-0 right-4 bg-green-500 p-1 rounded-full h-6 w-6 flex items-center justify-center">
+              <i class="fas fa-check text-xs"></i>
+            </span>
+          </div>
+          <h2 class="mt-4 text-xl font-bold">Sarah Williams</h2>
+          <p class="text-green-400">Frontend Developer</p>
+          <div class="mt-4 flex justify-center space-x-2">
+            <a href="#" class="bg-blue-600 hover:bg-blue-700 p-2 rounded-full">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="bg-gray-600 hover:bg-gray-700 p-2 rounded-full">
+              <i class="fab fa-github"></i>
+            </a>
+            <a href="#" class="bg-blue-400 hover:bg-blue-500 p-2 rounded-full">
+              <i class="fab fa-twitter"></i>
+            </a>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-700">
+            <p class="text-sm text-gray-400"><i class="fas fa-building mr-2"></i>BugSquashers Inc.</p>
+            <p class="text-sm text-gray-400"><i class="fas fa-envelope mr-2"></i>sarah@example.com</p>
+            <p class="text-sm text-gray-400"><i class="fas fa-phone mr-2"></i>+1 234 567 891</p>
+          </div>
+          <button class="mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg w-full disabled">
+            View Profile
+          </button>
+        </div>
+
+        <div class="col-span-2 bg-gray-800 p-6 rounded-xl shadow-lg card-hover transition-all duration-300">
+          <h2 class="text-xl font-bold mb-4">My Assignments</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-900 p-4 rounded-lg text-center stat-card">
+              <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-folder text-green-400 mr-2 text-lg"></i>
+                <h3 class="text-lg font-semibold text-green-400">My Projects</h3>
+              </div>
+              <p class="text-3xl font-bold">2</p>
+              <p class="text-sm text-gray-400 mt-2">Out of 12 total projects</p>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg text-center stat-card">
+              <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-spinner text-yellow-400 mr-2 text-lg"></i>
+                <h3 class="text-lg font-semibold text-yellow-400">In Progress</h3>
+              </div>
+              <p class="text-3xl font-bold">5</p>
+              <p class="text-sm text-gray-400 mt-2">3 due this week</p>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg text-center stat-card">
+              <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-check-circle text-green-400 mr-2 text-lg"></i>
+                <h3 class="text-lg font-semibold text-green-400">Completed</h3>
+              </div>
+              <p class="text-3xl font-bold">12</p>
+              <p class="text-sm text-gray-400 mt-2">This month</p>
+            </div>
+          </div>
+          
+          <div class="mt-6">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-medium">Current Sprint Progress</h3>
+              <span class="text-sm text-gray-400">65%</span>
+            </div>
+            <div class="bg-gray-900 rounded-full overflow-hidden mb-4">
+              <div class="bg-gradient-to-r from-green-500 to-green-400 h-2" style="width: 65%"></div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div>
+              <h3 class="font-medium mb-2">Recent Activity</h3>
+              <div class="space-y-2">
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg">
+                  <div class="rounded-full bg-blue-500 bg-opacity-20 p-2 mr-3">
+                    <i class="fas fa-code-branch text-blue-400 text-sm"></i>
+                  </div>
+                  <div class="text-sm">
+                    <p>Submitted PR for login fix</p>
+                    <p class="text-xs text-gray-400">1 hour ago</p>
+                  </div>
+                </div>
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg">
+                    <div class="rounded-full bg-blue-500 bg-opacity-20 p-2 mr-3">
+                      <i class="fas fa-code-branch text-blue-400 text-sm"></i>
+                    </div>
+                    <div class="text-sm">
+                      <p>Submitted PR for login fix</p>
+                      <p class="text-xs text-gray-400">1 hour ago</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center bg-gray-900 p-2 rounded-lg">
+                    <div class="rounded-full bg-green-500 bg-opacity-20 p-2 mr-3">
+                      <i class="fas fa-bug text-green-400 text-sm"></i>
+                    </div>
+                    <div class="text-sm">
+                      <p>Fixed navbar responsiveness bug</p>
+                      <p class="text-xs text-gray-400">3 hours ago</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center bg-gray-900 p-2 rounded-lg">
+                    <div class="rounded-full bg-yellow-500 bg-opacity-20 p-2 mr-3">
+                      <i class="fas fa-comment text-yellow-400 text-sm"></i>
+                    </div>
+                    <div class="text-sm">
+                      <p>Commented on issue #42</p>
+                      <p class="text-xs text-gray-400">Yesterday</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h3 class="font-medium mb-2">Skills</h3>
+                <div class="space-y-3">
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>JavaScript</span>
+                      <span>92%</span>
+                    </div>
+                    <div class="bg-gray-900 rounded-full overflow-hidden">
+                      <div class="bg-blue-500 h-2" style="width: 92%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>React</span>
+                      <span>85%</span>
+                    </div>
+                    <div class="bg-gray-900 rounded-full overflow-hidden">
+                      <div class="bg-blue-500 h-2" style="width: 85%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>CSS/Tailwind</span>
+                      <span>78%</span>
+                    </div>
+                    <div class="bg-gray-900 rounded-full overflow-hidden">
+                      <div class="bg-blue-500 h-2" style="width: 78%"></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span>Testing</span>
+                      <span>65%</span>
+                    </div>
+                    <div class="bg-gray-900 rounded-full overflow-hidden">
+                      <div class="bg-blue-500 h-2" style="width: 65%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <!-- Leave Application Form -->
+            <div class="col-span-2 bg-gray-800 p-6 rounded-xl shadow-lg card-hover transition-all duration-300">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold flex items-center">
+                  <i class="fas fa-calendar-alt text-green-400 mr-2"></i>
+                  Apply for Leave
+                </h2>
+                <span class="bg-gray-700 text-xs text-gray-300 py-1 px-2 rounded">
+                  Balance: <span class="font-bold text-green-400">14 days</span>
+                </span>
+              </div>
+              
+              <form class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Leave Type</label>
+                    <select class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                      <option value="annual">Annual Leave</option>
+                      <option value="sick">Sick Leave</option>
+                      <option value="personal">Personal Leave</option>
+                      <option value="bereavement">Bereavement Leave</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Duration</label>
+                    <div class="flex space-x-2">
+                      <label class="flex items-center bg-gray-900 border border-gray-700 rounded-lg p-2 flex-1 cursor-pointer hover:bg-gray-800">
+                        <input type="radio" name="duration" value="full" class="mr-2" checked>
+                        <span>Full Day</span>
+                      </label>
+                      <label class="flex items-center bg-gray-900 border border-gray-700 rounded-lg p-2 flex-1 cursor-pointer hover:bg-gray-800">
+                        <input type="radio" name="duration" value="half" class="mr-2">
+                        <span>Half Day</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">From Date</label>
+                    <input type="date" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-400 mb-1">To Date</label>
+                    <input type="date" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                  </div>
+                </div>
+                
+                <div id="halfDayOptions" class="hidden">
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Half Day Preference</label>
+                  <div class="flex space-x-2">
+                    <label class="flex items-center bg-gray-900 border border-gray-700 rounded-lg p-2 flex-1 cursor-pointer hover:bg-gray-800">
+                      <input type="radio" name="halfDayTime" value="first" class="mr-2" checked>
+                      <span>First Half (AM)</span>
+                    </label>
+                    <label class="flex items-center bg-gray-900 border border-gray-700 rounded-lg p-2 flex-1 cursor-pointer hover:bg-gray-800">
+                      <input type="radio" name="halfDayTime" value="second" class="mr-2">
+                      <span>Second Half (PM)</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Reason for Leave</label>
+                  <textarea rows="3" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Please provide details about your leave request..."></textarea>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Handover Tasks to</label>
+                  <select class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <option value="">Select team member</option>
+                    <option value="john">John Doe</option>
+                    <option value="emma">Emma Wilson</option>
+                    <option value="michael">Michael Brown</option>
+                    <option value="alex">Alex Chen</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Handover Notes</label>
+                  <textarea rows="2" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Notes for team member handling your tasks..."></textarea>
+                </div>
+                
+                <div>
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Contact While on Leave</label>
+                  <input type="tel" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Phone number">
+                </div>
+                
+                <div>
+                  <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" class="rounded text-green-500 focus:ring-green-500 mr-2">
+                    <span class="text-sm text-gray-300">I confirm that my team and manager have been informed about this leave request</span>
+                  </label>
+                </div>
+                
+                <div class="flex space-x-3">
+                  <button type="submit" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg flex-1 transition-all duration-300">
+                    Submit Request
+                  </button>
+                  <button type="button" class="bg-gray-700 hover:bg-gray-600 px-6 py-2 rounded-lg flex-shrink-0 transition-all duration-300">
+                    Save Draft
+                  </button>
+                </div>
+              </form>
+            </div>
+        
+            <!-- Team & Manager Info -->
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg card-hover transition-all duration-300">
+              <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fas fa-users text-green-400 mr-2"></i>
+                Team & Manager
+              </h2>
+        
+              <!-- Manager info -->
+              <div class="mb-6 leave-card bg-gray-900 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-md font-medium mb-3">Your Manager</h3>
+                <div class="flex items-center">
+                  <img src="/api/placeholder/50/50" alt="Manager" class="w-12 h-12 rounded-full border-2 border-blue-500" />
+                  <div class="ml-3">
+                    <p class="font-medium">David Chen</p>
+                    <p class="text-sm text-gray-400">Project Manager</p>
+                  </div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-gray-700 grid grid-cols-2 gap-2">
+                  <a href="#" class="text-center bg-gray-800 hover:bg-gray-700 p-2 rounded-lg text-sm">
+                    <i class="fas fa-envelope mr-1"></i> Email
+                  </a>
+                  <a href="#" class="text-center bg-gray-800 hover:bg-gray-700 p-2 rounded-lg text-sm">
+                    <i class="fas fa-phone mr-1"></i> Call
+                  </a>
+                </div>
+              </div>
+        
+              <!-- Team members -->
+              <div class="leave-card bg-gray-900 p-4 rounded-lg border border-gray-700">
+                <h3 class="text-md font-medium mb-3">Your Team</h3>
+                <div class="flex flex-wrap">
+                  <div class="team-avatar flex-shrink-0 flex flex-col items-center mb-3 mr-4">
+                    <img src="/api/placeholder/40/40" alt="John" class="w-10 h-10 rounded-full border-2 border-green-500" />
+                    <span class="text-xs mt-1">John</span>
+                  </div>
+                  <div class="team-avatar flex-shrink-0 flex flex-col items-center mb-3 mr-4">
+                    <img src="/api/placeholder/40/40" alt="Emma" class="w-10 h-10 rounded-full border-2 border-green-500" />
+                    <span class="text-xs mt-1">Emma</span>
+                  </div>
+                  <div class="team-avatar flex-shrink-0 flex flex-col items-center mb-3 mr-4">
+                    <img src="/api/placeholder/40/40" alt="Michael" class="w-10 h-10 rounded-full border-2 border-green-500" />
+                    <span class="text-xs mt-1">Michael</span>
+                  </div>
+                  <div class="team-avatar flex-shrink-0 flex flex-col items-center mb-3 mr-4">
+                    <img src="/api/placeholder/40/40" alt="Alex" class="w-10 h-10 rounded-full border-2 border-yellow-500" />
+                    <span class="text-xs mt-1">Alex</span>
+                  </div>
+                </div>
+        
+                <div class="mt-4">
+                  <h3 class="text-md font-medium mb-2">Team Leave Calendar</h3>
+                  <div class="bg-gray-800 rounded-lg p-3 mb-3">
+                    <div class="flex justify-between text-sm">
+                      <span>John Doe</span>
+                      <span class="text-yellow-400">Apr 20-22</span>
+                    </div>
+                  </div>
+                  <div class="bg-gray-800 rounded-lg p-3">
+                    <div class="flex justify-between text-sm">
+                      <span>Emma Wilson</span>
+                      <span class="text-yellow-400">May 5-8</span>
+                    </div>
+                  </div>
+                </div>
+        
+                <div class="mt-4">
+                  <h3 class="text-md font-medium mb-2">Leave Status</h3>
+                  <div class="space-y-2">
+                    <div>
+                      <div class="flex justify-between text-sm mb-1">
+                        <span>Team Coverage</span>
+                        <span>85%</span>
+                      </div>
+                      <div class="bg-gray-800 rounded-full overflow-hidden">
+                        <div class="bg-green-500 h-2" style="width: 85%"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flex justify-between text-sm mb-1">
+                        <span>Your Used Leave</span>
+                        <span>8/22 days</span>
+                      </div>
+                      <div class="bg-gray-800 rounded-full overflow-hidden">
+                        <div class="bg-blue-500 h-2" style="width: 36%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        
+            </div>
+          </section>
+        
+        
+
+        
+        <!-- Footer -->
+        <footer class="mt-8 py-4 border-t border-gray-800 text-center text-sm text-gray-400">
+          <p>© 2025 CryBug Bug Tracking System. All rights reserved.</p>
+          <p class="mt-1">Version 2.5.0</p>
+        </footer>
+        
+      </main>
+    </div>
+  
+  </body>
+  </html>

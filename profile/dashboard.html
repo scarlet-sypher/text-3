@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryBug | User Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="../src/output.css">
+  <script src="dashboard.js" defer></script>
+
+  
+
+</head>
+<body class="bg-gradient-custom text-white min-h-screen font-sans bg-black antialiased">
+
+  <div class="overlay" id="sidebarOverlay"></div>
+  
+  <div class="flex flex-col md:flex-row">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+      <div class="flex items-center justify-between mb-8 p-2">
+        <div class="flex items-center">
+          <i class="fas fa-bug text-red-500 text-2xl mr-2"></i>
+          <h1 class="text-xl font-bold text-red-500">CryBug</h1>
+        </div>
+        <button class="close-sidebar md:hidden text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <nav>
+        <ul class="space-y-2">
+          <li>
+            <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+              <i class="fas fa-home mr-3"></i>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="dashboard.html" class="sidebar-link active flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+              <i class="fas fa-tachometer-alt mr-3"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="project.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Projects" data-section="projects-section">
+              <i class="fas fa-project-diagram mr-3"></i>
+              <span>Projects</span>
+            </a>
+          </li>
+          <li>
+            <a href="bug.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Bugs">
+              <i class="fas fa-bug mr-3"></i>
+              <span>Bugs</span>
+            </a>
+          </li>
+          <li>
+            <a href="team.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Team">
+              <i class="fas fa-users mr-3"></i>
+              <span>Team</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="setting.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+              <i class="fas fa-cog mr-3"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="mt-auto pt-8">
+        <div class="border-t border-gray-700 pt-4">
+          <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+            <i class="fas fa-question-circle mr-3"></i>
+            <span>Help Center</span>
+          </a>
+          <button class="mt-4 w-full bg-red-600 hover:bg-red-700 p-2 rounded flex items-center justify-center">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+
+      <!-- Mobile Menu Toggle -->
+       <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Top Bar -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold">Welcome Back, John!</h1>
+          <p class="text-gray-400" id="currentDateTime">Loading date...</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="notificationBtn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-dot"></span>
+            </button>
+            <div class="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="notificationDropdown">
+              <div class="text-sm font-medium border-b border-gray-700 pb-2 mb-2">Notifications</div>
+              <div class="notification-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <span class="status-badge status-active mt-1"></span>
+                <div>
+                  <p class="text-sm">New bug reported in Project Alpha</p>
+                  <p class="text-xs text-gray-400">5 minutes ago</p>
+                </div>
+              </div>
+              <div class="notification-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <span class="status-badge status-pending mt-1"></span>
+                <div>
+                  <p class="text-sm">Team meeting at 3:00 PM</p>
+                  <p class="text-xs text-gray-400">2 hours ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="messageBtn">
+              <i class="fas fa-envelope"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="messageDropdown">
+              <div class="text-sm font-medium border-b border-gray-700 pb-2 mb-2">Messages</div>
+              <div class="message-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <img src="/api/placeholder/30/30" alt="Alice" class="w-8 h-8 rounded-full mr-2" />
+                <div>
+                  <p class="text-sm">Alice Johnson</p>
+                  <p class="text-xs text-gray-400">Can you review PR #203?</p>
+                </div>
+              </div>
+              <div class="message-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <img src="/api/placeholder/30/30" alt="Bob" class="w-8 h-8 rounded-full mr-2" />
+                <div>
+                  <p class="text-sm">Bob Smith</p>
+                  <p class="text-xs text-gray-400">Found a critical bug in login</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <button id="profileDropdownBtn" class="flex items-center">
+              <img src="/api/placeholder/40/40" alt="Profile" class="h-10 w-10 rounded-full border-2 border-red-500" />
+              <i class="fas fa-chevron-down ml-2 text-xs text-gray-400"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="profileDropdown">
+              <a href="#" class="block p-2 hover:bg-gray-700 rounded text-sm">
+                <i class="fas fa-user mr-2"></i> My Profile
+              </a>
+              <a href="#" class="block p-2 hover:bg-gray-700 rounded text-sm">
+                <i class="fas fa-cog mr-2"></i> Account Settings
+              </a>
+              <a href="#" class="block p-2 hover:bg-gray-700 rounded text-sm text-red-400">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Stats Cards Row -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-blue-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-tasks text-blue-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Total Tasks</p>
+              <h3 class="text-xl font-bold">24</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-green-400">
+            <i class="fas fa-arrow-up mr-1"></i> 12% <span class="text-gray-400 ml-1">from last week</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-red-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-bug text-red-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Open Bugs</p>
+              <h3 class="text-xl font-bold">7</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-red-400">
+            <i class="fas fa-arrow-up mr-1"></i> 3% <span class="text-gray-400 ml-1">from yesterday</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-green-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-check-circle text-green-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Resolved</p>
+              <h3 class="text-xl font-bold">18</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-green-400">
+            <i class="fas fa-arrow-up mr-1"></i> 24% <span class="text-gray-400 ml-1">from last week</span>
+          </div>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl p-4 card-hover transition-all duration-300">
+          <div class="flex items-center">
+            <div class="rounded-full bg-purple-500 bg-opacity-20 p-3 mr-4">
+              <i class="fas fa-users text-purple-400"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-400">Team Size</p>
+              <h3 class="text-xl font-bold">5</h3>
+            </div>
+          </div>
+          <div class="mt-2 flex items-center text-sm text-green-400">
+            <i class="fas fa-plus mr-1"></i> <span class="text-gray-400">2 members this month</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Profile Section -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg text-center card-hover transition-all duration-300">
+          <div class="relative inline-block">
+            <img src="../images/gallery/5.jpg" alt="Profile" class="w-32 h-32 mx-auto rounded-full border-4 border-red-500" />
+            <span class="absolute bottom-0 right-4 bg-green-500 p-1 rounded-full h-6 w-6 flex items-center justify-center">
+              <i class="fas fa-check text-xs"></i>
+            </span>
+          </div>
+          <h2 class="mt-4 text-xl font-bold">John Doe</h2>
+          <p class="text-red-400">Lead Developer</p>
+          <div class="mt-4 flex justify-center space-x-2">
+            <a href="#" class="bg-blue-600 hover:bg-blue-700 p-2 rounded-full">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="bg-gray-600 hover:bg-gray-700 p-2 rounded-full">
+              <i class="fab fa-github"></i>
+            </a>
+            <a href="#" class="bg-blue-400 hover:bg-blue-500 p-2 rounded-full">
+              <i class="fab fa-twitter"></i>
+            </a>
+          </div>
+          <div class="mt-4 pt-4 border-t border-gray-700">
+            <p class="text-sm text-gray-400"><i class="fas fa-building mr-2"></i>BugSquashers Inc.</p>
+            <p class="text-sm text-gray-400"><i class="fas fa-envelope mr-2"></i>john@example.com</p>
+            <p class="text-sm text-gray-400"><i class="fas fa-phone mr-2"></i>+1 234 567 890</p>
+          </div>
+          <a href="setting.html">
+          <button class="mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg w-full">
+            Edit Profile
+          </button>
+        </a>
+        </div>
+
+        <div class="col-span-2 bg-gray-800 p-6 rounded-xl shadow-lg card-hover transition-all duration-300">
+          <h2 class="text-xl font-bold mb-4">Project Statistics</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-900 p-4 rounded-lg text-center stat-card">
+              <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-folder text-red-400 mr-2 text-lg"></i>
+                <h3 class="text-lg font-semibold text-red-400">Total Projects</h3>
+              </div>
+              <p class="text-3xl font-bold">12</p>
+              <p class="text-sm text-gray-400 mt-2">+3 from last month</p>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg text-center stat-card">
+              <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-spinner text-yellow-400 mr-2 text-lg"></i>
+                <h3 class="text-lg font-semibold text-yellow-400">Ongoing</h3>
+              </div>
+              <p class="text-3xl font-bold">3</p>
+              <p class="text-sm text-gray-400 mt-2">2 near completion</p>
+            </div>
+            <div class="bg-gray-900 p-4 rounded-lg text-center stat-card">
+              <div class="flex items-center justify-center mb-2">
+                <i class="fas fa-check-circle text-green-400 mr-2 text-lg"></i>
+                <h3 class="text-lg font-semibold text-green-400">Completed</h3>
+              </div>
+              <p class="text-3xl font-bold">9</p>
+              <p class="text-sm text-gray-400 mt-2">75% success rate</p>
+            </div>
+          </div>
+          
+          <div class="mt-6">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-medium">Project Completion</h3>
+              <span class="text-sm text-gray-400">75%</span>
+            </div>
+            <div class="bg-gray-900 rounded-full overflow-hidden mb-4">
+              <div class="bg-gradient-to-r from-red-500 to-red-400 h-2" style="width: 75%"></div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div>
+              <h3 class="font-medium mb-2">Recent Activity</h3>
+              <div class="space-y-2">
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg">
+                  <div class="rounded-full bg-blue-500 bg-opacity-20 p-2 mr-3">
+                    <i class="fas fa-code-branch text-blue-400 text-sm"></i>
+                  </div>
+                  <div class="text-sm">
+                    <p>New branch created</p>
+                    <p class="text-xs text-gray-400">2 hours ago</p>
+                  </div>
+                </div>
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg">
+                  <div class="rounded-full bg-green-500 bg-opacity-20 p-2 mr-3">
+                    <i class="fas fa-bug text-green-400 text-sm"></i>
+                  </div>
+                  <div class="text-sm">
+                    <p>Bug #42 resolved</p>
+                    <p class="text-xs text-gray-400">Yesterday</p>
+                  </div>
+                </div>
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg">
+                  <div class="rounded-full bg-purple-500 bg-opacity-20 p-2 mr-3">
+                    <i class="fas fa-user-plus text-purple-400 text-sm"></i>
+                  </div>
+                  <div class="text-sm">
+                    <p>New team member added</p>
+                    <p class="text-xs text-gray-400">3 days ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-medium mb-2">Upcoming Deadlines</h3>
+              <div class="space-y-2">
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg border-l-4 border-red-500">
+                  <div class="text-sm flex-1">
+                    <p>Project Alpha Phase 2</p>
+                    <p class="text-xs text-gray-400">Tomorrow</p>
+                  </div>
+                  <span class="text-xs bg-red-500 px-2 py-1 rounded">Urgent</span>
+                </div>
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg border-l-4 border-yellow-500">
+                  <div class="text-sm flex-1">
+                    <p>Weekly Team Meeting</p>
+                    <p class="text-xs text-gray-400">Wednesday, 3:00 PM</p>
+                  </div>
+                  <span class="text-xs bg-yellow-500 px-2 py-1 rounded">Soon</span>
+                </div>
+                <div class="flex items-center bg-gray-900 p-2 rounded-lg border-l-4 border-blue-500">
+                  <div class="text-sm flex-1">
+                    <p>Client Presentation</p>
+                    <p class="text-xs text-gray-400">Next Monday</p>
+                  </div>
+                  <span class="text-xs bg-blue-500 px-2 py-1 rounded">Planned</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap justify-end gap-4 mt-6">
+            <a href="project.html"><button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded flex items-center" id="addProjectBtn">
+              <i class="fas fa-plus mr-2"></i> Add New Project
+            </button>
+          </a>
+
+          <a href="bug.html">
+            <button class="bg-yellow-400 hover:bg-yellow-700 px-4 py-2 rounded flex items-center" id="reportBugBtn">
+              <i class="fas fa-bug mr-2"></i> Report New Bug
+            </button>
+          </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Team Table -->
+      <section class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 card-hover transition-all duration-300">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold"><i class="fas fa-users mr-2"></i>Team Members</h2>
+          <button class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm">Add Member</button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="text-gray-400 border-b border-gray-600">
+              <tr>
+                <th class="p-2">Name</th>
+                <th class="p-2">Email</th>
+                <th class="p-2">Role</th>
+                <th class="p-2">Tasks</th>
+                <th class="p-2">Progress</th>
+                <th class="p-2">Status</th>
+                <th class="p-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="text-white">
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="p-2 flex items-center">
+                  <img src="/api/placeholder/30/30" alt="Alice Johnson" class="w-8 h-8 rounded-full mr-2" />
+                  <span>Alice Johnson</span>
+                </td>
+                <td class="p-2">alice@bugteam.com</td>
+                <td class="p-2">Frontend Dev</td>
+                <td class="p-2">5</td>
+                <td class="p-2 w-32">
+                  <div class="bg-gray-900 rounded-full h-2 overflow-hidden">
+                    <div class="bg-green-500 h-full" style="width: 85%"></div>
+                  </div>
+                </td>
+                <td class="p-2">
+                  <span class="flex items-center">
+                    <span class="status-badge status-active"></span>Active
+                  </span>
+                </td>
+                <td class="p-2">
+                  <div class="flex space-x-2">
+                    <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                    <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="p-2 flex items-center">
+                  <img src="/api/placeholder/30/30" alt="Bob Smith" class="w-8 h-8 rounded-full mr-2" />
+                  <span>Bob Smith</span>
+                </td>
+                <td class="p-2">bob@bugteam.com</td>
+                <td class="p-2">QA Tester</td>
+                <td class="p-2">3</td>
+                <td class="p-2 w-32">
+                  <div class="bg-gray-900 rounded-full h-2 overflow-hidden">
+                    <div class="bg-yellow-500 h-full" style="width: 45%"></div>
+                  </div>
+                </td>
+                <td class="p-2">
+                  <span class="flex items-center">
+                    <span class="status-badge status-pending"></span>Pending
+                  </span>
+                </td>
+                <td class="p-2">
+                  <div class="flex space-x-2">
+                    <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                    <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="p-2 flex items-center">
+                  <img src="/api/placeholder/30/30" alt="Carol Davis" class="w-8 h-8 rounded-full mr-2" />
+                  <span>Carol Davis</span>
+                </td>
+                <td class="p-2">carol@bugteam.com</td>
+                <td class="p-2">Backend Dev</td>
+                <td class="p-2">2</td>
+                <td class="p-2 w-32">
+                  <div class="bg-gray-900 rounded-full h-2 overflow-hidden">
+                    <div class="bg-red-500 h-full" style="width: 20%"></div>
+                  </div>
+                </td>
+                <td class="p-2">
+                  <span class="flex items-center">
+                    <span class="status-badge status-leave"></span>On Leave
+                  </span>
+                </td>
+                <td class="p-2">
+                  <div class="flex space-x-2">
+                    <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit"></i></button>
+                    <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Recent Bugs -->
+      <section class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8 card-hover transition-all duration-300">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold"><i class="fas fa-bug mr-2"></i>Recent Bugs</h2>
+          <button class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm">View All</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="bug-card bg-gray-900 rounded-lg overflow-hidden">
+            <div class="bug-priority-high p-2 text-white text-sm flex justify-between items-center">
+              <span><i class="fas fa-exclamation-circle mr-1"></i> High Priority</span>
+              <span>Bug #104</span>
+            </div>
+            <div class="p-4">
+              <h3 class="font-medium">Login Authentication Failure</h3>
+              <p class="text-sm text-gray-400 mt-1">Users unable to login after password reset</p>
+              <div class="flex justify-between items-center mt-3">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/24/24" alt="Assigned to" class="w-6 h-6 rounded-full border border-gray-700" />
+                  <span class="text-xs text-gray-400 ml-2">Alice J.</span>
+                </div>
+                <span class="text-xs bg-gray-800 px-2 py-1 rounded">Today</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bug-card bg-gray-900 rounded-lg overflow-hidden">
+            <div class="bug-priority-medium p-2 text-white text-sm flex justify-between items-center">
+              <span><i class="fas fa-exclamation-triangle mr-1"></i> Medium Priority</span>
+              <span>Bug #103</span>
+            </div>
+            <div class="p-4">
+              <h3 class="font-medium">Form Validation Error</h3>
+              <p class="text-sm text-gray-400 mt-1">Email validation regex not working correctly</p>
+              <div class="flex justify-between items-center mt-3">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/24/24" alt="Assigned to" class="w-6 h-6 rounded-full border border-gray-700" />
+                  <span class="text-xs text-gray-400 ml-2">Bob S.</span>
+                </div>
+                <span class="text-xs bg-gray-800 px-2 py-1 rounded">Yesterday</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bug-card bg-gray-900 rounded-lg overflow-hidden">
+            <div class="bug-priority-low p-2 text-white text-sm flex justify-between items-center">
+              <span><i class="fas fa-info-circle mr-1"></i> Low Priority</span>
+              <span>Bug #102</span>
+            </div>
+            <div class="p-4">
+              <h3 class="font-medium">UI Alignment Issue</h3>
+              <p class="text-sm text-gray-400 mt-1">Dashboard cards misaligned on mobile view</p>
+              <div class="flex justify-between items-center mt-3">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/24/24" alt="Assigned to" class="w-6 h-6 rounded-full border border-gray-700" />
+                  <span class="text-xs text-gray-400 ml-2">John D.</span>
+                </div>
+                <span class="text-xs bg-gray-800 px-2 py-1 rounded">2 days ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+</body>
+</html>

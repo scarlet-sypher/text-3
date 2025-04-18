@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryBug | Help Center</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+  
+  <style>
+    /* Gradient background */
+    .bg-gradient-custom {
+      background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+    
+    /* Card hover effects */
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Active state for sidebar links */
+    .sidebar-link.active {
+      background-color: rgba(239, 68, 68, 0.1);
+      border-left: 3px solid #ef4444;
+      color: white;
+    }
+    
+    /* Input focus styles */
+    .input-focus:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-custom text-white min-h-screen font-sans antialiased">
+
+    <div class="overlay" id="sidebarOverlay"></div>
+    
+  <div class="flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+        <div class="flex items-center justify-between mb-8 p-2">
+          <div class="flex items-center">
+            <i class="fas fa-bug text-red-500 text-2xl mr-2"></i>
+            <h1 class="text-xl font-bold text-red-500">CryBug</h1>
+          </div>
+          <button class="close-sidebar md:hidden text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <nav>
+          <ul class="space-y-2">
+            <li>
+              <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+                <i class="fas fa-home mr-3"></i>
+                <span>Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="dashboard.html" class="sidebar-link  flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+                <i class="fas fa-tachometer-alt mr-3"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="project.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Projects" data-section="projects-section">
+                <i class="fas fa-project-diagram mr-3"></i>
+                <span>Projects</span>
+              </a>
+            </li>
+            <li>
+              <a href="bug.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Bugs">
+                <i class="fas fa-bug mr-3"></i>
+                <span>Bugs</span>
+              </a>
+            </li>
+            <li>
+              <a href="team.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Team">
+                <i class="fas fa-users mr-3"></i>
+                <span>Team</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="setting.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+                <i class="fas fa-cog mr-3"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="mt-auto pt-8">
+          <div class="border-t border-gray-700 pt-4">
+            <a href="help.html" class="flex items-center p-3 rounded active text-gray-300 hover:text-white" data-title="Help Center">
+              <i class="fas fa-question-circle mr-3"></i>
+              <span>Help Center</span>
+            </a>
+            <button class="mt-4 w-full bg-red-600 hover:bg-red-700 p-2 rounded flex items-center justify-center">
+              <i class="fas fa-sign-out-alt mr-2"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+    <!-- Main Content Area -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+        <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+            <i class="fas fa-bars"></i>
+          </button>
+      <!-- Page Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div class="flex flex-col gap-2">
+          <h1 class="text-2xl md:text-3xl font-bold">Help Center</h1>
+          <p class="text-gray-400" id="currentDateTime">Loading date...</p>
+          <p class="text-gray-400">Get support and resources for using CryBug</p>
+        </div>
+      </div>
+      
+      <!-- Help Center Content -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Contact Information -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg card-hover">
+          <h3 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fas fa-address-card text-red-500 mr-2"></i> Contact Information
+          </h3>
+          <div class="space-y-4">
+            <div class="flex items-start">
+              <div class="flex-shrink-0 bg-gray-700 p-2 rounded-full">
+                <i class="fas fa-phone text-red-500"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-300">Support Hotline</p>
+                <p class="text-lg">+1 (800) 555-1234</p>
+                <p class="text-xs text-gray-400">Available 24/7</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="flex-shrink-0 bg-gray-700 p-2 rounded-full">
+                <i class="fas fa-envelope text-red-500"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-300">Email Support</p>
+                <p class="text-lg">support@crybug.com</p>
+                <p class="text-xs text-gray-400">Response within 24 hours</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="flex-shrink-0 bg-gray-700 p-2 rounded-full">
+                <i class="fas fa-map-marker-alt text-red-500"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-300">Office Address</p>
+                <p class="text-lg">BugSquashers Inc.</p>
+                <p>123 Debugging Lane</p>
+                <p>Silicon Valley, CA 94043</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="flex-shrink-0 bg-gray-700 p-2 rounded-full">
+                <i class="fas fa-clock text-red-500"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm font-medium text-gray-300">Business Hours</p>
+                <p>Monday - Friday: 9:00 AM - 6:00 PM (PST)</p>
+                <p>Saturday - Sunday: Closed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Report an Issue -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg card-hover">
+          <h3 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i> Report an Issue
+          </h3>
+          <form id="reportIssueForm">
+            <div class="mb-4">
+              <label class="block text-gray-400 text-sm font-medium mb-2">Issue Type</label>
+              <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 input-focus focus:outline-none">
+                <option>Application Bug</option>
+                <option>UI/UX Issue</option>
+                <option>Performance Problem</option>
+                <option>Feature Request</option>
+                <option>Account Problem</option>
+                <option>Other</option>
+              </select>
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-400 text-sm font-medium mb-2">Issue Summary</label>
+              <input type="text" placeholder="Brief description of the issue" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 input-focus focus:outline-none">
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-400 text-sm font-medium mb-2">Issue Details</label>
+              <textarea placeholder="Please provide as much detail as possible" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 input-focus focus:outline-none" rows="4"></textarea>
+            </div>
+            
+            <div class="mb-4">
+              <label class="block text-gray-400 text-sm font-medium mb-2">Priority</label>
+              <div class="flex space-x-4">
+                <label class="flex items-center">
+                  <input type="radio" name="priority" class="form-radio h-4 w-4 text-red-500">
+                  <span class="ml-2 text-sm">Low</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="priority" class="form-radio h-4 w-4 text-red-500" checked>
+                  <span class="ml-2 text-sm">Medium</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="priority" class="form-radio h-4 w-4 text-red-500">
+                  <span class="ml-2 text-sm">High</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="priority" class="form-radio h-4 w-4 text-red-500">
+                  <span class="ml-2 text-sm">Critical</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="flex justify-end">
+              <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">
+                <i class="fas fa-paper-plane mr-2"></i> Submit Report
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg card-hover">
+          <h3 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fas fa-question-circle text-red-500 mr-2"></i> Frequently Asked Questions
+          </h3>
+          <div class="space-y-4">
+            <div class="border-b border-gray-700 pb-3">
+              <div class="flex justify-between items-center cursor-pointer faq-toggle">
+                <h4 class="font-medium">How do I create a new project?</h4>
+                <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+              </div>
+              <p class="text-gray-400 text-sm mt-2 faq-answer hidden">Go to the Projects tab and click on the "New Project" button. Fill in the project details and save.</p>
+            </div>
+            <div class="border-b border-gray-700 pb-3">
+              <div class="flex justify-between items-center cursor-pointer faq-toggle">
+                <h4 class="font-medium">How do I assign a bug to a team member?</h4>
+                <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+              </div>
+              <p class="text-gray-400 text-sm mt-2 faq-answer hidden">Open the bug details, click on the "Assign" dropdown, and select the team member from the list.</p>
+            </div>
+            <div class="border-b border-gray-700 pb-3">
+              <div class="flex justify-between items-center cursor-pointer faq-toggle">
+                <h4 class="font-medium">How do I change my notification settings?</h4>
+                <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+              </div>
+              <p class="text-gray-400 text-sm mt-2 faq-answer hidden">Go to Settings > Notification Settings and adjust your preferences according to your needs.</p>
+            </div>
+            <div class="border-b border-gray-700 pb-3">
+              <div class="flex justify-between items-center cursor-pointer faq-toggle">
+                <h4 class="font-medium">How do I export bug reports?</h4>
+                <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+              </div>
+              <p class="text-gray-400 text-sm mt-2 faq-answer hidden">In the Reports section, select the criteria for your report, then click the "Export" button to download as CSV or PDF.</p>
+            </div>
+            <div>
+              <div class="flex justify-between items-center cursor-pointer faq-toggle">
+                <h4 class="font-medium">I forgot my password. What should I do?</h4>
+                <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+              </div>
+              <p class="text-gray-400 text-sm mt-2 faq-answer hidden">Click on the "Forgot Password" link on the login page. You'll receive an email with instructions to reset your password.</p>
+            </div>
+          </div>
+          <div class="mt-4 text-center">
+            <a href="#" class="text-red-400 hover:text-red-300 text-sm">View all FAQs <i class="fas fa-arrow-right ml-1"></i></a>
+          </div>
+        </div>
+        
+        <!-- Documentation & Resources -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow-lg card-hover">
+          <h3 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fas fa-book text-red-500 mr-2"></i> Documentation & Resources
+          </h3>
+          <div class="space-y-3">
+            <a href="#" class="flex items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-all">
+              <i class="fas fa-file-alt text-red-500 mr-3"></i>
+              <div>
+                <h4 class="font-medium">User Manual</h4>
+                <p class="text-xs text-gray-400">Complete guide to using CryBug</p>
+              </div>
+            </a>
+            <a href="#" class="flex items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-all">
+              <i class="fas fa-video text-red-500 mr-3"></i>
+              <div>
+                <h4 class="font-medium">Video Tutorials</h4>
+                <p class="text-xs text-gray-400">Step-by-step visual guides</p>
+              </div>
+            </a>
+            <a href="#" class="flex items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-all">
+              <i class="fas fa-keyboard text-red-500 mr-3"></i>
+              <div>
+                <h4 class="font-medium">Keyboard Shortcuts</h4>
+                <p class="text-xs text-gray-400">Speed up your workflow</p>
+              </div>
+            </a>
+            <a href="#" class="flex items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-all">
+              <i class="fas fa-lightbulb text-red-500 mr-3"></i>
+              <div>
+                <h4 class="font-medium">Tips & Best Practices</h4>
+                <p class="text-xs text-gray-400">Get the most out of CryBug</p>
+              </div>
+            </a>
+            <a href="#" class="flex items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-700 transition-all">
+              <i class="fas fa-code text-red-500 mr-3"></i>
+              <div>
+                <h4 class="font-medium">API Documentation</h4>
+                <p class="text-xs text-gray-400">For developers integrating with CryBug</p>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Live Chat Support -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow-lg mt-6 card-hover">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+          <div class="flex items-center mb-4 md:mb-0">
+            <div class="bg-green-500 h-3 w-3 rounded-full mr-2 animate-pulse"></div>
+            <h3 class="text-xl font-semibold">Live Support Available</h3>
+          </div>
+          <p class="text-gray-400 mb-4 md:mb-0">Average response time: <span class="text-green-500 font-medium">2 minutes</span></p>
+          <button type="button" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded flex items-center">
+            <i class="fas fa-comments mr-2"></i> Start Live Chat
+          </button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Mobile menu toggle
+      const menuToggleBtns = document.querySelectorAll('.menu-toggle');
+      const sidebar = document.querySelector('.sidebar');
+      
+      menuToggleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          sidebar.classList.toggle('active');
+        });
+      });
+      
+      // Form submission
+      const reportIssueForm = document.getElementById('reportIssueForm');
+      if (reportIssueForm) {
+        reportIssueForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          alert('Your issue has been reported. Our support team will contact you shortly.');
+        });
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const faqToggles = document.querySelectorAll('.faq-toggle');
+    
+    faqToggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const answer = toggle.nextElementSibling;
+        const icon = toggle.querySelector('i');
+        
+        // Toggle answer visibility
+        answer.classList.toggle('hidden');
+        
+        // Rotate icon
+        if (answer.classList.contains('hidden')) {
+          icon.style.transform = 'rotate(0deg)';
+        } else {
+          icon.style.transform = 'rotate(180deg)';
+        }
+      });
+    });
+  });
+  </script>
+</body>
+</html>

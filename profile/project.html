@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryBug | Projects</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+
+  
+  <style>
+    /* Custom styles for the modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      max-width: 90%;
+      width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .glass-effect {
+      background-color: rgba(23, 25, 35, 0.85);
+      backdrop-filter: blur(10px);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Active state for sidebar links */
+    
+    
+    /* Gradient background */
+    .bg-gradient-custom {
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+    
+    /* Card hover effects */
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+
+</head>
+<body class="bg-gradient-custom text-white min-h-screen font-sans bg-black antialiased">
+
+    <div class="overlay" id="sidebarOverlay"></div>
+  <div class="flex flex-col md:flex-row">
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+        <div class="flex items-center justify-between mb-8 p-2">
+          <div class="flex items-center">
+            <i class="fas fa-bug text-red-500 text-2xl mr-2"></i>
+            <h1 class="text-xl font-bold text-red-500">CryBug</h1>
+          </div>
+          <button class="close-sidebar md:hidden text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <nav>
+          <ul class="space-y-2">
+            <li>
+              <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+                <i class="fas fa-home mr-3"></i>
+                <span>Home</span>
+              </a>
+            </li>
+            <li>
+              <a href="dashboard.html" class="sidebar-link  flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+                <i class="fas fa-tachometer-alt mr-3"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="project.html" class="sidebar-link flex active items-center p-3 rounded text-gray-300 hover:text-white" data-title="Projects" data-section="projects-section">
+                <i class="fas fa-project-diagram mr-3"></i>
+                <span>Projects</span>
+              </a>
+            </li>
+            <li>
+              <a href="bug.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Bugs">
+                <i class="fas fa-bug mr-3"></i>
+                <span>Bugs</span>
+              </a>
+            </li>
+            <li>
+              <a href="team.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Team">
+                <i class="fas fa-users mr-3"></i>
+                <span>Team</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="setting.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+                <i class="fas fa-cog mr-3"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        
+        <div class="mt-auto pt-8">
+          <div class="border-t border-gray-700 pt-4">
+            <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+              <i class="fas fa-question-circle mr-3"></i>
+              <span>Help Center</span>
+            </a>
+            <button class="mt-4 w-full bg-red-600 hover:bg-red-700 p-2 rounded flex items-center justify-center">
+              <i class="fas fa-sign-out-alt mr-2"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+    <!-- Main Content Area -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+        <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+            <i class="fas fa-bars"></i>
+          </button>
+      <!-- Page Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div class="flex flex-col gap-2">
+          <h1 class="text-2xl md:text-3xl font-bold">Projects Management</h1>
+          <p class="text-gray-400" id="currentDateTime">Loading date...</p>
+          <p class="text-gray-400">View, create and manage all your projects</p>
+        </div>
+        
+        <button class="mt-4 md:mt-0 bg-red-600 hover:bg-red-700 px-4 py-2 rounded flex items-center" id="addProjectBtn">
+          <i class="fas fa-plus mr-2"></i> New Project
+        </button>
+      </div>
+      
+      <!-- Project Filter Row -->
+      <div class="bg-gray-800 p-4 rounded-xl mb-6">
+        <div class="flex flex-col md:flex-row gap-4">
+          <div class="flex-1">
+            <input type="text" placeholder="Search projects..." class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+          </div>
+          <div class="flex gap-2">
+            <select class="bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>All Status</option>
+              <option>Active</option>
+              <option>On Hold</option>
+              <option>Completed</option>
+            </select>
+            <select class="bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>Sort By</option>
+              <option>Name</option>
+              <option>Date</option>
+              <option>Priority</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Projects Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Project Card 1 -->
+        <div class="bg-gray-800 rounded-xl p-5 card-hover transition-all duration-300">
+          <div class="flex justify-between items-start mb-4">
+            <div class="rounded-lg bg-blue-500 bg-opacity-20 p-3">
+              <i class="fas fa-code text-blue-400 text-xl"></i>
+            </div>
+            <div class="bg-green-500 text-xs py-1 px-3 rounded-full">Active</div>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Project Alpha</h3>
+          <p class="text-gray-400 text-sm mb-4">User authentication system with OAuth integration and password recovery</p>
+          
+          <div class="mb-3">
+            <div class="flex justify-between items-center mb-1 text-sm">
+              <span>Progress</span>
+              <span>75%</span>
+            </div>
+            <div class="bg-gray-900 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-r from-red-500 to-red-400 h-2" style="width: 75%"></div>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex -space-x-2">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+              <span class="w-8 h-8 rounded-full bg-gray-700 border-2 border-gray-800 flex items-center justify-center text-xs">+2</span>
+            </div>
+            <div class="text-xs text-gray-400">Deadline: Apr 28, 2025</div>
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between">
+            <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit mr-1"></i> Edit</button>
+            <button class="text-yellow-400 hover:text-yellow-300"><i class="fas fa-pause-circle mr-1"></i> Pause</button>
+            <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash mr-1"></i> Delete</button>
+          </div>
+        </div>
+        
+        <!-- Project Card 2 -->
+        <div class="bg-gray-800 rounded-xl p-5 card-hover transition-all duration-300">
+          <div class="flex justify-between items-start mb-4">
+            <div class="rounded-lg bg-purple-500 bg-opacity-20 p-3">
+              <i class="fas fa-mobile-alt text-purple-400 text-xl"></i>
+            </div>
+            <div class="bg-yellow-500 text-xs py-1 px-3 rounded-full">On Hold</div>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Project Beta</h3>
+          <p class="text-gray-400 text-sm mb-4">Mobile responsive dashboard with dark/light theme toggle functionality</p>
+          
+          <div class="mb-3">
+            <div class="flex justify-between items-center mb-1 text-sm">
+              <span>Progress</span>
+              <span>45%</span>
+            </div>
+            <div class="bg-gray-900 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-r from-yellow-500 to-yellow-400 h-2" style="width: 45%"></div>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex -space-x-2">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+            </div>
+            <div class="text-xs text-gray-400">Deadline: May 15, 2025</div>
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between">
+            <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit mr-1"></i> Edit</button>
+            <button class="text-green-400 hover:text-green-300"><i class="fas fa-play-circle mr-1"></i> Resume</button>
+            <button class="text-red-400 hover:text-red-300"><i class="fas fa-trash mr-1"></i> Delete</button>
+          </div>
+        </div>
+        
+        <!-- Project Card 3 -->
+        <div class="bg-gray-800 rounded-xl p-5 card-hover transition-all duration-300">
+          <div class="flex justify-between items-start mb-4">
+            <div class="rounded-lg bg-green-500 bg-opacity-20 p-3">
+              <i class="fas fa-chart-line text-green-400 text-xl"></i>
+            </div>
+            <div class="bg-blue-500 text-xs py-1 px-3 rounded-full">Completed</div>
+          </div>
+          <h3 class="text-lg font-bold mb-2">Project Gamma</h3>
+          <p class="text-gray-400 text-sm mb-4">Analytics dashboard with real-time data visualization and export options</p>
+          
+          <div class="mb-3">
+            <div class="flex justify-between items-center mb-1 text-sm">
+              <span>Progress</span>
+              <span>100%</span>
+            </div>
+            <div class="bg-gray-900 rounded-full overflow-hidden">
+              <div class="bg-gradient-to-r from-green-500 to-green-400 h-2" style="width: 100%"></div>
+            </div>
+          </div>
+          
+          <div class="flex items-center justify-between">
+            <div class="flex -space-x-2">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+              <img src="/api/placeholder/30/30" alt="User" class="w-8 h-8 rounded-full border-2 border-gray-800">
+            </div>
+            <div class="text-xs text-gray-400">Completed: Apr 10, 2025</div>
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-gray-700 flex justify-between">
+            <button class="text-blue-400 hover:text-blue-300"><i class="fas fa-edit mr-1"></i> Edit</button>
+            <button class="text-purple-400 hover:text-purple-300"><i class="fas fa-copy mr-1"></i> Clone</button>
+            <button class="text-red-400 hover:text-red-300"><i class="fas fa-archive mr-1"></i> Archive</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Project Details Section -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow-lg mb-8">
+        <h2 class="text-xl font-bold mb-6 flex items-center">
+          <i class="fas fa-info-circle mr-2 text-red-400"></i>Project Details
+        </h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Project Info -->
+          <div class="bg-gray-900 p-4 rounded-lg">
+            <h3 class="font-bold text-lg mb-3">Project Alpha</h3>
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm text-gray-400">Description</p>
+                <p>User authentication system with OAuth integration and password recovery</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Status</p>
+                <p class="text-green-400">Active</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Created By</p>
+                <p>John Doe</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Start Date</p>
+                <p>March 15, 2025</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-400">Deadline</p>
+                <p>April 28, 2025</p>
+              </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-700">
+              <button class="w-full bg-blue-600 hover:bg-blue-700 p-2 rounded flex items-center justify-center">
+                <i class="fas fa-edit mr-2"></i> Edit Project
+              </button>
+            </div>
+          </div>
+          
+          <!-- Team Members -->
+          <div class="bg-gray-900 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold text-lg">Project Team</h3>
+              <button class="text-xs bg-gray-700 hover:bg-gray-600 p-1 px-2 rounded">
+                <i class="fas fa-plus mr-1"></i> Add
+              </button>
+            </div>
+            
+            <div class="space-y-3">
+              <div class="flex items-center justify-between bg-gray-800 p-2 rounded">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/30/30" alt="Alice" class="w-8 h-8 rounded-full mr-2" />
+                  <div>
+                    <p class="text-sm">Alice Johnson</p>
+                    <p class="text-xs text-gray-400">Frontend Dev</p>
+                  </div>
+                </div>
+                <div>
+                  <span class="bg-blue-500 text-xs py-1 px-2 rounded-full">Lead</span>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between bg-gray-800 p-2 rounded">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/30/30" alt="Bob" class="w-8 h-8 rounded-full mr-2" />
+                  <div>
+                    <p class="text-sm">Bob Smith</p>
+                    <p class="text-xs text-gray-400">Backend Dev</p>
+                  </div>
+                </div>
+                <div>
+                  <span class="bg-purple-500 text-xs py-1 px-2 rounded-full">Member</span>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between bg-gray-800 p-2 rounded">
+                <div class="flex items-center">
+                  <img src="/api/placeholder/30/30" alt="Carol" class="w-8 h-8 rounded-full mr-2" />
+                  <div>
+                    <p class="text-sm">Carol Davis</p>
+                    <p class="text-xs text-gray-400">QA Tester</p>
+                  </div>
+                </div>
+                <div>
+                  <span class="bg-green-500 text-xs py-1 px-2 rounded-full">Member</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-700">
+              <button class="w-full bg-purple-600 hover:bg-purple-700 p-2 rounded flex items-center justify-center">
+                <i class="fas fa-users mr-2"></i> Manage Team
+              </button>
+            </div>
+          </div>
+          
+          <!-- Task Progress -->
+          <div class="bg-gray-900 p-4 rounded-lg">
+            <div class="flex justify-between items-center mb-3">
+              <h3 class="font-bold text-lg">Tasks</h3>
+              <div class="text-sm"><span class="text-green-400">8</span> / 12 Done</div>
+            </div>
+            
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between items-center mb-1 text-sm">
+                  <span>Frontend Tasks</span>
+                  <span>4/5</span>
+                </div>
+                <div class="bg-gray-800 rounded-full overflow-hidden">
+                  <div class="bg-blue-500 h-2" style="width: 80%"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center mb-1 text-sm">
+                  <span>Backend Tasks</span>
+                  <span>3/4</span>
+                </div>
+                <div class="bg-gray-800 rounded-full overflow-hidden">
+                  <div class="bg-purple-500 h-2" style="width: 75%"></div>
+                </div>
+              </div>
+              
+              <div>
+                <div class="flex justify-between items-center mb-1 text-sm">
+                  <span>Testing Tasks</span>
+                  <span>1/3</span>
+                </div>
+                <div class="bg-gray-800 rounded-full overflow-hidden">
+                  <div class="bg-yellow-500 h-2" style="width: 33%"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-4 space-y-2">
+              <div class="flex items-center p-2 bg-gray-800 rounded">
+                <input type="checkbox" checked class="mr-2" disabled>
+                <span class="line-through text-gray-400">Setup authentication routes</span>
+              </div>
+              <div class="flex items-center p-2 bg-gray-800 rounded">
+                <input type="checkbox" checked class="mr-2" disabled>
+                <span class="line-through text-gray-400">Create user profile page</span>
+              </div>
+              <div class="flex items-center p-2 bg-gray-800 rounded">
+                <input type="checkbox" class="mr-2" disabled>
+                <span>Implement password reset feature</span>
+              </div>
+              <div class="flex items-center p-2 bg-gray-800 rounded">
+                <input type="checkbox" class="mr-2" disabled>
+                <span>Test OAuth providers</span>
+              </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-gray-700">
+              <button class="w-full bg-green-600 hover:bg-green-700 p-2 rounded flex items-center justify-center">
+                <i class="fas fa-tasks mr-2"></i> Manage Tasks
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Project Modal -->
+  <div id="addProjectModal" class="modal">
+      <div class="modal-content glass-effect p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-bold text-white"><i class="fas fa-plus-circle mr-2"></i>Add New Project</h2>
+          <button class="close-modal text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <form>
+          <div class="mb-4">
+            <label class="block text-gray-400 text-sm font-medium mb-2">Project Name</label>
+            <input type="text" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" placeholder="Enter project name">
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-400 text-sm font-medium mb-2">Description</label>
+            <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="3" placeholder="Project description"></textarea>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-400 text-sm font-medium mb-2">Project Type</label>
+            <select class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option value="">Select type</option>
+              <option value="development">Development</option>
+              <option value="design">Design</option>
+              <option value="marketing">Marketing</option>
+              <option value="research">Research</option>
+            </select>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-gray-400 text-sm font-medium mb-2">Start Date</label>
+              <input type="date" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+            </div>
+            <div>
+              <label class="block text-gray-400 text-sm font-medium mb-2">End Date</label>
+              <input type="date" class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-400 text-sm font-medium mb-2">Priority Level</label>
+            <div class="flex space-x-4">
+              <label class="inline-flex items-center">
+                <input type="radio" name="priority" class="text-red-500">
+                <span class="ml-2 text-gray-400">Low</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="radio" name="priority" class="text-red-500">
+                <span class="ml-2 text-gray-400">Medium</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="radio" name="priority" class="text-red-500">
+                <span class="ml-2 text-gray-400">High</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-400 text-sm font-medium mb-2">Budget</label>
+            <div class="flex">
+              <span class="inline-flex items-center px-3 bg-gray-800 text-gray-400 border border-r-0 border-gray-700 rounded-l">$</span>
+              <input type="number" class="w-full bg-gray-900 text-white border border-gray-700 rounded-r p-2 focus:outline-none focus:border-red-500" placeholder="Enter budget amount">
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-400 text-sm font-medium mb-2">Team Members</label>
+            <select multiple class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500">
+              <option>Alice Johnson</option>
+              <option>Bob Smith</option>
+              <option>Carol Davis</option>
+              <option>David Wilson</option>
+            </select>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-gray-400 text-sm font-medium mb-2">Initial Tasks</label>
+            <textarea class="w-full bg-gray-900 text-white border border-gray-700 rounded p-2 focus:outline-none focus:border-red-500" rows="2" placeholder="List key initial tasks or milestones"></textarea>
+          </div>
+          
+          <div class="flex justify-end gap-2 mt-6">
+            <button type="button" class="close-modal bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Cancel</button>
+            <button type="submit" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Create Project</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  <script>
+   document.addEventListener("DOMContentLoaded", () => {
+    // Modal functionality for Add Project button
+    const addProjectBtn = document.getElementById('addProjectBtn');
+    const addProjectModal = document.getElementById('addProjectModal');
+    const closeModalBtns = addProjectModal.querySelectorAll('.close-modal');
+    
+    // Open the modal when the Add Project button is clicked
+    addProjectBtn.addEventListener('click', () => {
+      addProjectModal.style.display = 'flex';
+      setTimeout(() => {
+        addProjectModal.querySelector('.modal-content').style.opacity = '1';
+      }, 10);
+    });
+    
+    // Close the modal when the close buttons are clicked
+    closeModalBtns.forEach(closeBtn => {
+      closeBtn.addEventListener('click', () => {
+        addProjectModal.querySelector('.modal-content').style.opacity = '0';
+        setTimeout(() => {
+          addProjectModal.style.display = 'none';
+        }, 300);
+      });
+    });
+    
+    // Close the modal when clicking outside the modal content
+    window.addEventListener('click', (e) => {
+      if (e.target === addProjectModal) {
+        addProjectModal.querySelector('.modal-content').style.opacity = '0';
+        setTimeout(() => {
+          addProjectModal.style.display = 'none';
+        }, 300);
+      }
+    });
+
+    // Mobile menu toggle
+    const menuToggleBtns = document.querySelectorAll('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    menuToggleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+      });
+    });
+    
+    // Form validation
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevent the default form submission
+        // Here you would normally handle form submission via AJAX or other methods
+        
+        // Close the modal after submission
+        addProjectModal.querySelector('.modal-content').style.opacity = '0';
+        setTimeout(() => {
+          addProjectModal.style.display = 'none';
+        }, 300);
+        
+        // Optional: Show a success message
+        alert('Project created successfully!');
+      });
+    });
+  });
+
+  </script>
+
+</body>
+</html>

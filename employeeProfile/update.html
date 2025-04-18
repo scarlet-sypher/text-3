@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CryBug | Update Progress</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="../src/output.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="dashboard.js" defer></script>
+</head>
+<body class="bg-gradient-custom text-white min-h-screen font-sans bg-black antialiased">
+
+  <div class="overlay" id="sidebarOverlay"></div>
+  
+  <div class="flex flex-col md:flex-row">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-gray-900 p-4 md:fixed md:h-screen transition-all">
+      <div class="flex items-center justify-between mb-8 p-2">
+        <div class="flex items-center">
+          <i class="fas fa-bug text-green-500 text-2xl mr-2"></i>
+          <h1 class="text-xl font-bold text-green-500">CryBug</h1>
+        </div>
+        <button class="close-sidebar md:hidden text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <nav>
+        <ul class="space-y-2">
+          <li>
+            <a href="../index.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Home">
+              <i class="fas fa-home mr-3"></i>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="dashboard.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Dashboard">
+              <i class="fas fa-tachometer-alt mr-3"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="project.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Projects">
+              <i class="fas fa-project-diagram mr-3"></i>
+              <span>Projects</span>
+            </a>
+          </li>
+          <li>
+            <a href="bug.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Bugs">
+              <i class="fas fa-bug mr-3"></i>
+              <span>Bugs</span>
+            </a>
+          </li>
+          <li>
+            <a href="update.html" class="sidebar-link active flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Reports">
+              <i class="fas fa-tasks mr-3"></i>
+              <span>Update Progress</span>
+            </a>
+          </li>
+          <li>
+            <a href="setting.html" class="sidebar-link flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Settings">
+              <i class="fas fa-cog mr-3"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="mt-auto pt-8">
+        <div class="border-t border-gray-700 pt-4">
+          <a href="help.html" class="flex items-center p-3 rounded text-gray-300 hover:text-white" data-title="Help Center">
+            <i class="fas fa-question-circle mr-3"></i>
+            <span>Help Center</span>
+          </a>
+          <button class="mt-4 w-full bg-green-600 hover:bg-green-700 p-2 rounded flex items-center justify-center">
+            <i class="fas fa-sign-out-alt mr-2"></i>
+            <span>Logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="md:ml-64 lg:ml-64 flex-1 p-4 md:p-6 transition-all">
+
+      <!-- Mobile Menu Toggle -->
+      <button class="menu-toggle md:hidden mb-4 bg-gray-800 p-2 rounded">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Top Bar -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-bold">Update Progress</h1>
+          <p class="text-gray-400" id="currentDateTime">Loading date...</p>
+        </div>
+        
+        <div class="mt-4 md:mt-0 flex items-center space-x-4">
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="notificationBtn">
+              <i class="fas fa-bell"></i>
+              <span class="notification-dot"></span>
+            </button>
+            <div class="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="notificationDropdown">
+              <div class="text-sm font-medium border-b border-gray-700 pb-2 mb-2">Notifications</div>
+              <div class="notification-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <span class="status-badge status-active mt-1"></span>
+                <div>
+                  <p class="text-sm">New bug assigned to you in Project Beta</p>
+                  <p class="text-xs text-gray-400">10 minutes ago</p>
+                </div>
+              </div>
+              <div class="notification-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <span class="status-badge status-pending mt-1"></span>
+                <div>
+                  <p class="text-sm">Team meeting at 2:00 PM</p>
+                  <p class="text-xs text-gray-400">1 hour ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <button class="p-2 bg-gray-800 rounded-full hover:bg-gray-700" id="messageBtn">
+              <i class="fas fa-envelope"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="messageDropdown">
+              <div class="text-sm font-medium border-b border-gray-700 pb-2 mb-2">Messages</div>
+              <div class="message-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <img src="/api/placeholder/30/30" alt="John" class="w-8 h-8 rounded-full mr-2" />
+                <div>
+                  <p class="text-sm">John Doe</p>
+                  <p class="text-xs text-gray-400">Can you check the latest bug fix?</p>
+                </div>
+              </div>
+              <div class="message-item flex items-start p-2 hover:bg-gray-700 rounded">
+                <img src="/api/placeholder/30/30" alt="Emma" class="w-8 h-8 rounded-full mr-2" />
+                <div>
+                  <p class="text-sm">Emma Wilson</p>
+                  <p class="text-xs text-gray-400">UX improvement suggestions</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="relative">
+            <button id="profileDropdownBtn" class="flex items-center">
+              <img src="/api/placeholder/40/40" alt="Profile" class="h-10 w-10 rounded-full border-2 border-green-500" />
+              <i class="fas fa-chevron-down ml-2 text-xs text-gray-400"></i>
+            </button>
+            <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg p-2 hidden" id="profileDropdown">
+              <a href="#" class="block p-2 hover:bg-gray-700 rounded text-sm">
+                <i class="fas fa-user mr-2"></i> My Profile
+              </a>
+              <a href="#" class="block p-2 hover:bg-gray-700 rounded text-sm text-green-400">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+      
+      <!-- Project Progress Section -->
+      <div class="bg-gray-800 rounded-xl p-6 mb-8 card-hover transition-all duration-300">
+        <h2 class="text-xl font-bold mb-4 flex items-center">
+          <i class="fas fa-project-diagram text-green-500 mr-2"></i>
+          Project Progress
+        </h2>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-700">
+            <thead>
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Project</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Progress</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Lead</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Updated</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+              <!-- Project 1 -->
+              <tr>
+                <td class="px-4 py-4">
+                  <div class="font-medium">Project Alpha</div>
+                  <div class="text-xs text-gray-400">Web Application</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="bg-yellow-500 text-xs px-2 py-1 rounded-full">In Progress</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+                      <div class="bg-green-500 h-2 rounded-full" style="width: 65%"></div>
+                    </div>
+                    <span class="text-sm">65%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/24/24" alt="Team Member" class="w-6 h-6 rounded-full mr-2">
+                    <span>John D.</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm">Apr 17, 2025</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium mr-2" data-project="Project Alpha" data-progress="65" data-status="In Progress" onclick="openUpdateModal(this)">Update</button>
+                </td>
+              </tr>
+              
+              <!-- Project 2 -->
+              <tr>
+                <td class="px-4 py-4">
+                  <div class="font-medium">Project Beta</div>
+                  <div class="text-xs text-gray-400">Mobile App</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="bg-blue-500 text-xs px-2 py-1 rounded-full">On Hold</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+                      <div class="bg-blue-500 h-2 rounded-full" style="width: 40%"></div>
+                    </div>
+                    <span class="text-sm">40%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/24/24" alt="Team Member" class="w-6 h-6 rounded-full mr-2">
+                    <span>Emma W.</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm">Apr 14, 2025</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium mr-2" data-project="Project Beta" data-progress="40" data-status="On Hold" onclick="openUpdateModal(this)">Update</button>
+                </td>
+              </tr>
+              
+              <!-- Project 3 -->
+              <tr>
+                <td class="px-4 py-4">
+                  <div class="font-medium">Project Gamma</div>
+                  <div class="text-xs text-gray-400">API Integration</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="bg-green-500 text-xs px-2 py-1 rounded-full">Completed</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+                      <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                    <span class="text-sm">100%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/24/24" alt="Team Member" class="w-6 h-6 rounded-full mr-2">
+                    <span>Alex M.</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm">Apr 10, 2025</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium mr-2" data-project="Project Gamma" data-progress="100" data-status="Completed" onclick="openUpdateModal(this)">Update</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Bug Progress Section -->
+      <div class="bg-gray-800 rounded-xl p-6 mb-8 card-hover transition-all duration-300">
+        <h2 class="text-xl font-bold mb-4 flex items-center">
+          <i class="fas fa-bug text-red-500 mr-2"></i>
+          Bug Progress
+        </h2>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-700">
+            <thead>
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Bug ID</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Title</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Project</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Progress</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Assigned To</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+              <!-- Bug 1 -->
+              <tr>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="font-medium">BUG-134</div>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="text-sm">Checkout process fails when applying coupon</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm">Project Alpha</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <span class="bg-yellow-500 text-xs px-2 py-1 rounded-full">In Progress</span>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+                      <div class="bg-yellow-500 h-2 rounded-full" style="width: 45%"></div>
+                    </div>
+                    <span class="text-sm">45%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/24/24" alt="Team Member" class="w-6 h-6 rounded-full mr-2">
+                    <span>John D.</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium mr-2" data-bug="BUG-134" data-title="Checkout process fails when applying coupon" data-progress="45" data-status="In Progress" onclick="openUpdateModal(this, 'bug')">Update</button>
+                </td>
+              </tr>
+              
+              <!-- Bug 2 -->
+              <tr>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="font-medium">BUG-133</div>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="text-sm">Mobile navigation menu doesn't close</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm">Project Beta</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <span class="bg-green-500 text-xs px-2 py-1 rounded-full">Fixed</span>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+                      <div class="bg-green-500 h-2 rounded-full" style="width: 100%"></div>
+                    </div>
+                    <span class="text-sm">100%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/24/24" alt="Team Member" class="w-6 h-6 rounded-full mr-2">
+                    <span>Emma W.</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium mr-2" data-bug="BUG-133" data-title="Mobile navigation menu doesn't close" data-progress="100" data-status="Fixed" onclick="openUpdateModal(this, 'bug')">Update</button>
+                </td>
+              </tr>
+              
+              <!-- Bug 3 -->
+              <tr>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="font-medium">BUG-132</div>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="text-sm">Product images not loading in Safari browser</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm">Project Alpha</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <span class="bg-red-500 text-xs px-2 py-1 rounded-full">Open</span>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+                      <div class="bg-red-500 h-2 rounded-full" style="width: 10%"></div>
+                    </div>
+                    <span class="text-sm">10%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/24/24" alt="Team Member" class="w-6 h-6 rounded-full mr-2">
+                    <span>Alex M.</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium mr-2" data-bug="BUG-132" data-title="Product images not loading in Safari browser" data-progress="10" data-status="Open" onclick="openUpdateModal(this, 'bug')">Update</button>
+                </td>
+              </tr>
+              
+              <!-- Bug 4 -->
+              <tr>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="font-medium">BUG-131</div>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="text-sm">Form validation error messages not displaying</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="text-sm">Project Beta</div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <span class="bg-yellow-500 text-xs px-2 py-1 rounded-full">In Progress</span>
+                </td>
+                <td class="px-4 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+                      <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
+                    </div>
+                    <span class="text-sm">60%</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img src="/api/placeholder/24/24" alt="Team Member" class="w-6 h-6 rounded-full mr-2">
+                    <span>Sarah L.</span>
+                  </div>
+                </td>
+                <td class="px-4 py-4 whitespace-nowrap">
+                  <button class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-xs font-medium mr-2" data-bug="BUG-131" data-title="Form validation error messages not displaying" data-progress="60" data-status="In Progress" onclick="openUpdateModal(this, 'bug')">Update</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination Controls -->
+        <div class="flex justify-between items-center mt-6">
+          <div class="text-sm text-gray-400">
+            Showing <span class="font-medium">1-4</span> of <span class="font-medium">10</span> bugs
+          </div>
+          <div class="flex space-x-1">
+            <button disabled class="px-3 py-1 rounded bg-gray-900 text-gray-500 cursor-not-allowed">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="px-3 py-1 rounded bg-green-600 text-white">1</button>
+            <button class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white">2</button>
+            <button class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white">3</button>
+            <button class="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Update Modal -->
+<!-- Update Modal -->
+<!-- Update Modal -->
+<div id="updateModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50">
+    <div class="flex items-center justify-center h-full w-full">
+      <div class="bg-gray-800 rounded-xl p-6 w-full max-w-md">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold" id="modalTitle">Update Progress</h3>
+          <button onclick="closeModal()" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm text-gray-400 mb-1">Item</label>
+          <p id="itemName" class="text-white font-medium"></p>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm text-gray-400 mb-1">Current Status</label>
+          <p id="currentStatus" class="text-white font-medium"></p>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm text-gray-400 mb-1">Current Progress</label>
+          <div class="flex items-center">
+            <div class="w-full bg-gray-700 rounded-full h-2 mr-2">
+              <div id="currentProgressBar" class="bg-green-500 h-2 rounded-full"></div>
+            </div>
+            <span id="currentProgressText" class="text-sm">0%</span>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="newStatus" class="block text-sm text-gray-400 mb-1">Update Status</label>
+          <select id="newStatus" class="bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 w-full">
+            <option value="not-started">Not Started</option>
+            <option value="in-progress">In Progress</option>
+            <option value="on-hold">On Hold</option>
+            <option value="completed">Completed</option>
+            <option value="fixed">Fixed</option>
+            <option value="open">Open</option>
+          </select>
+        </div>
+        
+        <div class="mb-4">
+          <label for="newProgress" class="block text-sm text-gray-400 mb-1">Update Progress (%)</label>
+          <input type="range" id="newProgress" min="0" max="100" class="w-full">
+          <div class="flex justify-between">
+            <span class="text-xs text-gray-400">0%</span>
+            <span id="progressValue" class="text-xs text-white font-medium">0%</span>
+            <span class="text-xs text-gray-400">100%</span>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="updateNote" class="block text-sm text-gray-400 mb-1">Update Note</label>
+          <textarea id="updateNote" rows="3" class="bg-gray-700 text-white border border-gray-600 rounded px-3 py-2 w-full" placeholder="Add details about this update..."></textarea>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+          <button onclick="closeModal()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Cancel</button>
+          <button onclick="saveUpdate()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">Save Update</button>
+        </div>
+      </div>
+    </div>
+  </div>
+          
+          <!-- JavaScript for modal functionality -->
+          <script>
+function openUpdateModal(element, type = 'project') {
+  const modal = document.getElementById('updateModal');
+  const itemName = document.getElementById('itemName');
+  const currentStatus = document.getElementById('currentStatus');
+  const currentProgressBar = document.getElementById('currentProgressBar');
+  const currentProgressText = document.getElementById('currentProgressText');
+  const newProgress = document.getElementById('newProgress');
+  const progressValue = document.getElementById('progressValue');
+  
+  // Set modal title
+  document.getElementById('modalTitle').textContent = type === 'project' ? 'Update Project Progress' : 'Update Bug Progress';
+  
+  // Set item name
+  if (type === 'project') {
+    itemName.textContent = element.dataset.project;
+  } else {
+    itemName.textContent = `${element.dataset.bug}: ${element.dataset.title}`;
+  }
+  
+  // Set current status
+  currentStatus.textContent = element.dataset.status;
+  
+  // Set current progress
+  const progress = parseInt(element.dataset.progress);
+  currentProgressBar.style.width = `${progress}%`;
+  currentProgressText.textContent = `${progress}%`;
+  
+  // Set initial value for range input
+  newProgress.value = progress;
+  progressValue.textContent = `${progress}%`;
+  
+  // Update progress text when slider changes
+  newProgress.addEventListener('input', function() {
+    progressValue.textContent = `${this.value}%`;
+  });
+  
+  // Show modal by removing hidden class
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeModal() {
+  const modal = document.getElementById('updateModal');
+  modal.classList.remove('flex');
+  modal.classList.add('hidden');
+}
+
+function saveUpdate() {
+  // Here you would normally save the update to the server
+  
+  // For demonstration, we'll just close the modal
+  closeModal();
+  
+  // Show success notification
+  alert('Progress updated successfully!');
+}
+          
+
+          </script>
+        </main>
+        </div>
+        </body>
+        </html>
